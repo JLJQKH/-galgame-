@@ -1,17 +1,25 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
+# Prerequisites
 *~
 *.autosave
-*.a
-*.core
-*.moc
+*.d
+*.flc
+
+# Compiled Object files
+*.slo
+*.lo
 *.o
 *.obj
 *.orig
 *.rej
+*.core
+*.moc
 *.so
 *.so.*
+*.dylib
+*.dll
 *_pch.h.cpp
 *_resource.rc
 *.qm
@@ -23,35 +31,22 @@ tags
 .DS_Store
 .directory
 *.debug
-Makefile*
-*.prl
-*.app
-moc_*.cpp
-ui_*.h
-qrc_*.cpp
-Thumbs.db
 *.res
 *.rc
-/.qmake.cache
-/.qmake.stash
-**/.qmlls.ini
 
-# qtcreator generated files
-*.pro.user*
-*.qbs.user*
-CMakeLists.txt.user*
+# Precompiled Headers
+*.gch
+*.pch
 
-# xemacs temporary files
-*.flc
+# Linker files
+*.ilk
 
-# Vim temporary files
-.*.swp
-
-# Visual Studio generated files
+# Debugger Files
+*.pdb
 *.ib_pdb_index
 *.idb
-*.ilk
-*.pdb
+
+# Visual Studio generated files
 *.sln
 *.suo
 *.vcproj
@@ -69,16 +64,65 @@ CMakeLists.txt.user*
 # Python byte code
 *.pyc
 
-# Binaries
-# --------
-*.dll
-*.exe
+# Fortran module files
+*.mod
+*.smod
 
-# Directories with generated files
-.moc/
-.obj/
-.pch/
-.rcc/
-.uic/
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables / Binaries
+*.exe
+*.out
+*.app
+
+# Build directories & generated files
+build/
+Build/
+build-*/
 /build*/
+/.qmake.cache
+/.qmake.stash
 /.qtcreator/
+Makefile*
+*.prl
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# Qt Creator / QMake generated files
+*.pro.user*
+*.qbs.user*
+CMakeLists.txt.user*
+**/.qmlls.ini
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+.*.swp
+*.swp
+
+# vcpkg
+vcpkg_installed/
+
+# debug information files
+*.dwo
+
+# test output & cache
+Testing/
+.cache/
+
+# OS files
+Thumbs.db
+desktop.ini
