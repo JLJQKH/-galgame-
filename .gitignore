@@ -126,3 +126,9 @@ Testing/
 # OS files
 Thumbs.db
 desktop.ini
+
+# IDE internal
+.trae/
+
+# Demo release packages (build artifacts with binaries)
+demo/

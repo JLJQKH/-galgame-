@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>galgame 游玩记录 · 项目演示</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#0f0a1f;
+  --bg-dark:#1a1330;
+  --bg-card:rgba(255,255,255,0.035);
+  --glass-border:rgba(255,255,255,0.09);
+  --accent-pink:#ff7aa8;
+  --accent-purple:#9b5de5;
+  --accent-blue:#3a9fff;
+  --accent-green:#5bd06d;
+  --accent-gold:#ffc94d;
+  --text-primary:#f3eeff;
+  --text-secondary:#b0a3cc;
+  --text-muted:#7a6b99;
+  --grad-main:linear-gradient(135deg,#ff7aa8 0%,#9b5de5 50%,#3a9fff 100%);
+  --grad-soft:linear-gradient(135deg,rgba(255,122,168,0.15),rgba(155,93,229,0.15),rgba(58,159,255,0.15));
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans SC',sans-serif;
+  background:var(--bg-deep);
+  color:var(--text-primary);
+  overflow-x:hidden;
+  line-height:1.7;
+}
+/* 全局噪点纹理 */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.4;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* ===== Hero 区 ===== */
+.hero{
+  position:relative;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  overflow:hidden;padding:2rem;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(155,93,229,0.28),transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%,rgba(255,122,168,0.18),transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 70%,rgba(58,159,255,0.16),transparent 60%),
+    var(--bg-deep);
+}
+/* 星点 */
+.stars{position:absolute;inset:0;z-index:1;overflow:hidden}
+.star{
+  position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;
+  animation:twinkle 3s infinite ease-in-out;
+}
+@keyframes twinkle{0%,100%{opacity:0.2;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
+/* 光晕装饰 */
+.glow{position:absolute;border-radius:50%;filter:blur(80px);z-index:1}
+.glow-1{width:500px;height:500px;background:rgba(255,122,168,0.15);top:-100px;left:-100px;animation:float 12s infinite ease-in-out}
+.glow-2{width:400px;height:400px;background:rgba(155,93,229,0.18);bottom:-80px;right:-80px;animation:float 15s infinite ease-in-out reverse}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-30px)}}
+
+.hero-content{position:relative;z-index:2;max-width:900px}
+.hero-tag{
+  display:inline-block;padding:6px 18px;border-radius:20px;
+  background:var(--bg-card);border:1px solid var(--glass-border);
+  font-size:0.85rem;color:var(--accent-pink);letter-spacing:2px;
+  margin-bottom:2rem;backdrop-filter:blur(10px);
+  opacity:0;animation:fadeUp 0.8s 0.2s forwards;
+}
+.hero-title{
+  font-family:'Noto Serif SC',serif;font-weight:900;
+  font-size:clamp(2.8rem,7vw,5.5rem);line-height:1.1;
+  background:var(--grad-main);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:1rem;letter-spacing:2px;
+  opacity:0;animation:fadeUp 0.8s 0.4s forwards;
+}
+.hero-subtitle{
+  font-family:'Noto Serif SC',serif;font-weight:400;
+  font-size:clamp(1.1rem,2.5vw,1.6rem);color:var(--text-secondary);
+  margin-bottom:2.5rem;letter-spacing:1px;
+  opacity:0;animation:fadeUp 0.8s 0.6s forwards;
+}
+.hero-desc{
+  font-size:1.05rem;color:var(--text-secondary);max-width:600px;margin:0 auto 3rem;
+  opacity:0;animation:fadeUp 0.8s 0.8s forwards;
+}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp 0.8s 1s forwards}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:30px;
+  font-family:'Noto Sans SC',sans-serif;font-weight:500;font-size:0.95rem;
+  text-decoration:none;cursor:pointer;transition:all 0.3s;border:none;
+}
+.btn-primary{background:var(--grad-main);color:#fff;box-shadow:0 8px 30px rgba(155,93,229,0.4)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(155,93,229,0.6)}
+.btn-ghost{background:var(--bg-card);color:var(--text-primary);border:1px solid var(--glass-border);backdrop-filter:blur(10px)}
+.btn-ghost:hover{background:rgba(255,255,255,0.08);border-color:var(--accent-purple)}
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:2;color:var(--text-muted);font-size:0.8rem;letter-spacing:2px;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== 通用区块 ===== */
+.section{position:relative;z-index:2;padding:6rem 2rem;max-width:1200px;margin:0 auto}
+.section-header{text-align:center;margin-bottom:4rem}
+.section-label{
+  display:inline-block;font-size:0.8rem;letter-spacing:4px;color:var(--accent-purple);
+  text-transform:uppercase;margin-bottom:1rem;font-weight:500;
+}
+.section-title{
+  font-family:'Noto Serif SC',serif;font-weight:700;
+  font-size:clamp(2rem,4vw,3rem);margin-bottom:1rem;
+}
+.section-desc{color:var(--text-secondary);max-width:600px;margin:0 auto;font-size:1.05rem}
+
+/* 滚动触发动画 */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.8s,transform 0.8s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ===== 功能特性区 ===== */
+.features-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:1.5rem;
+}
+.feature-card{
+  position:relative;padding:2rem;border-radius:20px;
+  background:var(--bg-card);border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);transition:all 0.4s;overflow:hidden;
+}
+.feature-card::before{
+  content:'';position:absolute;inset:0;border-radius:20px;padding:1px;
+  background:var(--grad-main);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  opacity:0;transition:opacity 0.4s;
+}
+.feature-card:hover{transform:translateY(-8px);background:rgba(255,255,255,0.06)}
+.feature-card:hover::before{opacity:1}
+.feature-icon{
+  font-size:2.2rem;width:60px;height:60px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;
+  background:var(--grad-soft);border:1px solid var(--glass-border);
+}
+.feature-title{font-size:1.25rem;font-weight:600;margin-bottom:0.6rem;font-family:'Noto Serif SC',serif}
+.feature-desc{color:var(--text-secondary);font-size:0.95rem;line-height:1.6}
+
+/* ===== 技术栈区 ===== */
+.tech-wrap{display:flex;flex-direction-wrap:wrap;gap:1rem;justify-content:center;flex-wrap:wrap}
+.tech-tag{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:30px;
+  background:var(--bg-card);border:1px solid var(--glass-border);backdrop-filter:blur(10px);
+  font-size:0.95rem;color:var(--text-primary);transition:all 0.3s;cursor:default;
+}
+.tech-tag:hover{transform:translateY(-3px);border-color:var(--accent-purple);box-shadow:0 8px 20px rgba(155,93,229,0.25)}
+.tech-tag .dot{width:8px;height:8px;border-radius:50%}
+.tech-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;margin-top:2rem}
+.tech-group{padding:1.8rem;border-radius:20px;background:var(--bg-card);border:1px solid var(--glass-border);backdrop-filter:blur(20px)}
+.tech-group-title{font-family:'Noto Serif SC',serif;font-size:1.1rem;margin-bottom:1.2rem;color:var(--accent-pink);display:flex;align-items:center;gap:8px}
+.tech-group-tags{display:flex;flex-wrap:wrap;gap:0.6rem}
+.tech-group-tags .tech-tag{padding:6px 14px;font-size:0.85rem}
+
+/* ===== 界面预览区 ===== */
+.preview-wrap{display:flex;justify-content:center;perspective:1500px}
+.mock-window{
+  width:100%;max-width:900px;border-radius:16px;overflow:hidden;
+  background:linear-gradient(135deg,#1e1638,#15102a);
+  border:1px solid var(--glass-border);
+  box-shadow:0 30px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(155,93,229,0.15);
+  transform:rotateX(2deg);transition:transform 0.5s;
+}
+.mock-window:hover{transform:rotateX(0deg)}
+.mock-toolbar{
+  display:flex;align-items:center;justify-content:flex-end;gap:6px;
+  padding:8px 12px;background:transparent;position:relative;
+}
+.mock-btn{
+  width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:0.9rem;cursor:pointer;transition:all 0.25s;
+  background:rgba(155,93,229,0.12);border:1px solid rgba(155,93,229,0.3);color:var(--accent-purple);
+}
+.mock-btn:hover{background:rgba(155,93,229,0.25);transform:scale(1.08)}
+.mock-btn.close:hover{background:#ff4444;border-color:#ff4444;color:#fff}
+.mock-toolbar-hint{text-align:center;font-size:0.78rem;color:var(--text-muted);padding:4px 0 12px;letter-spacing:1px}
+.mock-body{padding:0 1.2rem 1.2rem}
+.mock-search{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:12px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);margin-bottom:1rem;
+}
+.mock-search input{
+  flex:1;background:none;border:none;outline:none;color:var(--text-primary);
+  font-family:inherit;font-size:0.9rem;
+}
+.mock-search input::placeholder{color:var(--text-muted)}
+.mock-filters{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.mock-filter{padding:5px 14px;border-radius:20px;font-size:0.8rem;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);color:var(--text-secondary)}
+.mock-filter.active{background:rgba(155,93,229,0.2);border-color:var(--accent-purple);color:var(--text-primary)}
+.mock-games{display:flex;flex-direction:column;gap:10px}
+.mock-game{
+  display:flex;align-items:center;gap:14px;padding:12px;border-radius:14px;
+  background:rgba(255,255,255,0.025);border:1px solid var(--glass-border);transition:all 0.3s;
+}
+.mock-game:hover{background:rgba(155,93,229,0.08);border-color:rgba(155,93,229,0.3)}
+.mock-cover{width:56px;height:72px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.mock-info{flex:1;min-width:0}
+.mock-name{font-size:0.95rem;font-weight:500;margin-bottom:4px;font-family:'Noto Serif SC',serif}
+.mock-meta{display:flex;gap:8px;flex-wrap:wrap}
+.mock-badge{font-size:0.72rem;padding:2px 8px;border-radius:10px}
+.mock-badge.done{background:rgba(91,208,109,0.15);color:var(--accent-green)}
+.mock-badge.playing{background:rgba(255,201,77,0.15);color:var(--accent-gold)}
+.mock-badge.todo{background:rgba(58,159,255,0.15);color:var(--accent-blue)}
+.mock-badge.type{background:rgba(255,122,168,0.12);color:var(--accent-pink)}
+.mock-score{font-family:'Noto Serif SC',serif;font-weight:700;font-size:1.3rem;color:var(--accent-gold)}
+
+/* ===== 数据字段区 ===== */
+.data-table-wrap{overflow-x:auto;border-radius:20px;border:1px solid var(--glass-border);backdrop-filter:blur(20px);background:var(--bg-card)}
+.data-table{width:100%;border-collapse:collapse;min-width:600px}
+.data-table th{
+  padding:1rem 1.2rem;text-align:left;font-family:'Noto Serif SC',serif;font-weight:600;
+  font-size:0.95rem;background:rgba(155,93,229,0.12);
+  border-bottom:1px solid var(--glass-border);color:var(--text-primary);
+}
+.data-table td{padding:0.9rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.92rem}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(255,255,255,0.02)}
+.field-name{color:var(--accent-pink);font-weight:500}
+.field-type{color:var(--text-secondary)}
+.field-req{font-size:0.8rem;padding:2px 10px;border-radius:10px}
+.field-req.yes{background:rgba(91,208,109,0.15);color:var(--accent-green)}
+.field-req.no{background:rgba(255,255,255,0.05);color:var(--text-muted)}
+.field-example{color:var(--text-muted);font-style:italic}
+
+/* ===== 页脚 ===== */
+.footer{position:relative;z-index:2;padding:4rem 2rem 2rem;border-top:1px solid var(--glass-border);background:rgba(0,0,0,0.3)}
+.footer-content{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem}
+.footer-brand h3{font-family:'Noto Serif SC',serif;font-size:1.4rem;margin-bottom:0.8rem;background:var(--grad-main);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.footer-brand p{color:var(--text-secondary);font-size:0.9rem;max-width:400px}
+.footer-col h4{font-size:0.95rem;margin-bottom:1rem;color:var(--text-primary)}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:0.6rem;font-size:0.88rem;color:var(--text-secondary)}
+.footer-col li .emoji{margin-right:6px}
+.footer-bottom{max-width:1200px;margin:3rem auto 0;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.05);text-align:center;color:var(--text-muted);font-size:0.85rem}
+
+/* 响应式 */
+@media(max-width:1024px){
+  .footer-content{grid-template-columns:1fr 1fr}
+  .footer-brand{grid-column:1/-1}
+}
+@media(max-width:768px){
+  .section{padding:4rem 1.2rem}
+  .features-grid{grid-template-columns:1fr}
+  .footer-content{grid-template-columns:1fr;gap:2rem}
+  .hero-btns{flex-direction:column;align-items:center}
+  .btn{width:100%;max-width:280px;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Hero 区 ===== -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="stars" id="stars"></div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="hero-content">
+    <span class="hero-tag">QT 6 · C++ · QML 桌面应用</span>
+    <h1 class="hero-title">galgame 游玩记录</h1>
+    <p class="hero-subtitle">记录每一段心动的旅程</p>
+    <p class="hero-desc">一个专为 galgame 爱好者打造的本地桌面应用，替代 Excel 与记事本，以更结构化、更美观的方式管理你的游玩足迹。</p>
+    <div class="hero-btns">
+      <a href="#features" class="btn btn-primary">探索功能 ✨</a>
+      <a href="#preview" class="btn btn-ghost">界面预览 👁️</a>
+    </div>
+  </div>
+  <div class="scroll-hint">向下滚动 ↓</div>
+</section>
+
+<!-- ===== 功能特性区 ===== -->
+<section class="section" id="features">
+  <div class="section-header reveal">
+    <span class="section-label">FEATURES</span>
+    <h2 class="section-title">十一项核心功能</h2>
+    <p class="section-desc">从添加到回顾，覆盖 galgame 游玩记录的完整生命周期</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal"><div class="feature-icon">🎮</div><h3 class="feature-title">手动添加游戏</h3><p class="feature-desc">填写游戏名称、封面、类型、备注等信息，构建你的专属游戏库</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">🏷️</div><h3 class="feature-title">类型分类</h3><p class="feature-desc">校园、恋爱、穿越、悬疑、科幻……一个游戏可属于多个类型</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">⭐</div><h3 class="feature-title">评分系统</h3><p class="feature-desc">0–10 分精确到小数点后一位，为每段体验打上专属印记</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">📌</div><h3 class="feature-title">游玩状态</h3><p class="feature-desc">待玩、进行中、已完成三态管理，清晰掌握进度</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">🔍</div><h3 class="feature-title">快速搜索</h3><p class="feature-desc">按名称即时检索，几百条记录也能秒级定位</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">📋</div><h3 class="feature-title">列表展示</h3><p class="feature-desc">以卡片列表呈现游戏信息，点击即可打开详情</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">✏️</div><h3 class="feature-title">编辑与删除</h3><p class="feature-desc">随时修改记录，删除需二次确认防止误操作</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">📖</div><h3 class="feature-title">游戏详情</h3><p class="feature-desc">可缩放信息框展示封面、评分、时长与回忆模块</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">📸</div><h3 class="feature-title">回忆模块</h3><p class="feature-desc">每款游戏独立截图收藏，淡入淡出轮播重温感动瞬间</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">🔀</div><h3 class="feature-title">灵活排序</h3><p class="feature-desc">按名称、添加日期或评分排序，多种视角浏览收藏</p></div>
+    <div class="feature-card reveal"><div class="feature-icon">⏱️</div><h3 class="feature-title">游玩时长</h3><p class="feature-desc">记录投入的小时数，量化每段旅程的陪伴时光</p></div>
+  </div>
+</section>
+
+<!-- ===== 技术栈区 ===== -->
+<section class="section" id="tech">
+  <div class="section-header reveal">
+    <span class="section-label">TECH STACK</span>
+    <h2 class="section-title">技术选型</h2>
+    <p class="section-desc">基于 Qt 6 + C++ + QML 的原生桌面方案，兼顾性能与视觉表现力</p>
+  </div>
+  <div class="tech-groups">
+    <div class="tech-group reveal">
+      <h3 class="tech-group-title">🖥️ 核心框架</h3>
+      <div class="tech-group-tags">
+        <span class="tech-tag"><span class="dot" style="background:#41cd52"></span>Qt 6.11.1</span>
+        <span class="tech-tag"><span class="dot" style="background:#659ad2"></span>C++ 17</span>
+        <span class="tech-tag"><span class="dot" style="background:#ff7aa8"></span>QML / Qt Quick</span>
+      </div>
+    </div>
+    <div class="tech-group reveal">
+      <h3 class="tech-group-title">🔧 构建工具</h3>
+      <div class="tech-group-tags">
+        <span class="tech-tag"><span class="dot" style="background:#9b5de5"></span>CMake 3.30</span>
+        <span class="tech-tag"><span class="dot" style="background:#3a9fff"></span>MinGW 13.1</span>
+      </div>
+    </div>
+    <div class="tech-group reveal">
+      <h3 class="tech-group-title">💾 数据与模块</h3>
+      <div class="tech-group-tags">
+        <span class="tech-tag"><span class="dot" style="background:#5bd06d"></span>SQLite</span>
+        <span class="tech-tag"><span class="dot" style="background:#ffc94d"></span>Qt Charts</span>
+        <span class="tech-tag"><span class="dot" style="background:#ff8844"></span>Qt Multimedia</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 界面预览区 ===== -->
+<section class="section" id="preview">
+  <div class="section-header reveal">
+    <span class="section-label">PREVIEW</span>
+    <h2 class="section-title">界面预览</h2>
+    <p class="section-desc">无边框沉浸式窗口，自动隐藏工具栏，多种主题随心切换</p>
+  </div>
+  <div class="preview-wrap reveal">
+    <div class="mock-window">
+      <div class="mock-toolbar">
+        <div class="mock-btn" title="语言">🌍</div>
+        <div class="mock-btn" title="夜晚模式">🌙</div>
+        <div class="mock-btn" title="时钟">🕐</div>
+        <div class="mock-btn" title="设置">⚙️</div>
+        <div class="mock-btn" title="最小化">—</div>
+        <div class="mock-btn" title="最大化">☐</div>
+        <div class="mock-btn close" title="关闭">✕</div>
+      </div>
+      <div class="mock-toolbar-hint">↑ 鼠标移至顶部唤出工具栏 · 工具栏左侧拖动可移动窗口 · 边缘拖动可缩放</div>
+      <div class="mock-body">
+        <div class="mock-search">
+          <span>🔍</span>
+          <input type="text" placeholder="搜索游戏名称…" readonly>
+        </div>
+        <div class="mock-filters">
+          <span class="mock-filter active">全部</span>
+          <span class="mock-filter">待玩</span>
+          <span class="mock-filter">进行中</span>
+          <span class="mock-filter">已完成</span>
+        </div>
+        <div class="mock-games">
+          <div class="mock-game">
+            <div class="mock-cover" style="background:linear-gradient(135deg,#ff7aa8,#9b5de5)">🌸</div>
+            <div class="mock-info">
+              <div class="mock-name">CLANNAD</div>
+              <div class="mock-meta">
+                <span class="mock-badge done">已完成</span>
+                <span class="mock-badge type">校园</span>
+                <span class="mock-badge type">恋爱</span>
+              </div>
+            </div>
+            <div class="mock-score">9.3</div>
+          </div>
+          <div class="mock-game">
+            <div class="mock-cover" style="background:linear-gradient(135deg,#3a9fff,#5bd06d)">🌊</div>
+            <div class="mock-info">
+              <div class="mock-name">Summer Pockets</div>
+              <div class="mock-meta">
+                <span class="mock-badge playing">进行中</span>
+                <span class="mock-badge type">夏日</span>
+                <span class="mock-badge type">治愈</span>
+              </div>
+            </div>
+            <div class="mock-score">8.7</div>
+          </div>
+          <div class="mock-game">
+            <div class="mock-cover" style="background:linear-gradient(135deg,#ffc94d,#ff8844)">🍁</div>
+            <div class="mock-info">
+              <div class="mock-name">白色相簿2</div>
+              <div class="mock-meta">
+                <span class="mock-badge done">已完成</span>
+                <span class="mock-badge type">恋爱</span>
+                <span class="mock-badge type">青春</span>
+              </div>
+            </div>
+            <div class="mock-score">9.0</div>
+          </div>
+          <div class="mock-game">
+            <div class="mock-cover" style="background:linear-gradient(135deg,#9b5de5,#3a9fff)">🌙</div>
+            <div class="mock-info">
+              <div class="mock-name">月姬 -A Piece of Blue Glass-</div>
+              <div class="mock-meta">
+                <span class="mock-badge todo">待玩</span>
+                <span class="mock-badge type">悬疑</span>
+                <span class="mock-badge type">奇幻</span>
+              </div>
+            </div>
+            <div class="mock-score">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 数据字段区 ===== -->
+<section class="section" id="data">
+  <div class="section-header reveal">
+    <span class="section-label">DATA MODEL</span>
+    <h2 class="section-title">数据字段定义</h2>
+    <p class="section-desc">每条游戏记录包含以下九个字段，存储于本地 SQLite 数据库</p>
+  </div>
+  <div class="data-table-wrap reveal">
+    <table class="data-table">
+      <thead>
+        <tr><th>字段</th><th>类型</th><th>必填</th><th>示例</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="field-name">游戏名称</td><td class="field-type">文本</td><td><span class="field-req yes">必填</span></td><td class="field-example">《CLANNAD》</td></tr>
+        <tr><td class="field-name">封面图片</td><td class="field-type">本地文件路径</td><td><span class="field-req no">选填</span></td><td class="field-example">D:/covers/clannad.jpg</td></tr>
+        <tr><td class="field-name">类型标签</td><td class="field-type">多选文本</td><td><span class="field-req yes">必填</span></td><td class="field-example">校园、恋爱</td></tr>
+        <tr><td class="field-name">评分</td><td class="field-type">小数 0.0–10.0</td><td><span class="field-req no">选填</span></td><td class="field-example">9.3</td></tr>
+        <tr><td class="field-name">游玩状态</td><td class="field-type">枚举</td><td><span class="field-req yes">必填</span></td><td class="field-example">已完成</td></tr>
+        <tr><td class="field-name">游玩时长</td><td class="field-type">整数（小时）</td><td><span class="field-req no">选填</span></td><td class="field-example">50</td></tr>
+        <tr><td class="field-name">开始日期</td><td class="field-type">日期</td><td><span class="field-req no">选填</span></td><td class="field-example">2026-06-01</td></tr>
+        <tr><td class="field-name">完成日期</td><td class="field-type">日期</td><td><span class="field-req no">选填</span></td><td class="field-example">2026-07-05</td></tr>
+        <tr><td class="field-name">备注/感想</td><td class="field-type">长文本</td><td><span class="field-req no">选填</span></td><td class="field-example">非常治愈，结局很感动……</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 页脚 ===== -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <h3>🎮 galgame 游玩记录</h3>
+      <p>一个由编程小白与 AI 协作开发的 Qt 桌面应用，记录每一段 galgame 的心动旅程。完全本地存储，数据安全无忧。</p>
+    </div>
+    <div class="footer-col">
+      <h4>开发历程</h4>
+      <ul>
+        <li><span class="emoji">📅</span>2026-07-08 项目启动</li>
+        <li><span class="emoji">🏗️</span>Qt 6 + C++ + QML 架构</li>
+        <li><span class="emoji">🎨</span>多主题 + 无边框窗口</li>
+        <li><span class="emoji">✨</span>持续迭代中</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>特性亮点</h4>
+      <ul>
+        <li><span class="emoji">🖥️</span>无边框沉浸窗口</li>
+        <li><span class="emoji">🌙</span>夜晚模式</li>
+        <li><span class="emoji">🌍</span>四种语言切换</li>
+        <li><span class="emoji">🎬</span>视频背景支持</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    本项目仅用于个人学习与记录 · Built with Qt 6.11.1 + C++ + QML
+  </div>
+</footer>
+
+<script>
+// 生成星空
+(function(){
+  const container=document.getElementById('stars');
+  const count=80;
+  for(let i=0;i<count;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=Math.random()*3+'s';
+    s.style.animationDuration=(2+Math.random()*3)+'s';
+    const size=Math.random()*2+1;
+    s.style.width=size+'px';
+    s.style.height=size+'px';
+    container.appendChild(s);
+  }
+})();
+
+// 滚动触发动画
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}})
+},{threshold:0.12,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// 功能卡片错开动画延迟
+document.querySelectorAll('.feature-card.reveal').forEach((card,i)=>{
+  card.style.transitionDelay=(i%3)*0.1+'s';
+});
+</script>
+</body>
+</html>

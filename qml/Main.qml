@@ -13,6 +13,11 @@ Window {
     width: 960; height: 540
     minimumWidth: 720; minimumHeight: 405
     visible: true; title: "🎮 " + tt("appTitle"); color: cBg
+    flags: Qt.FramelessWindowHint | Qt.Window  // 无边框窗口（C++ 侧处理边缘缩放）
+    // 主背景容器：纯色背景填充
+    Rectangle {
+        id: bgRect; anchors.fill: parent; color: cBg
+    }
     id: root
     property bool isDark: false
     property string lastTheme: "blue"   // 进入黑夜模式前的主题，退出时恢复
@@ -46,7 +51,7 @@ Window {
             exportDefaultName:"galgame游玩记录",
             yearStr:"年", monthStr:"月", dayStr:"日", lunarPrefix:"农历",
             noMatchGame:"没找到匹配的游戏", emptyGameList:"还没有游戏\n点上方「➕ 添加」开始记录",
-            fileBtn:"📁 文件", warnTitle:"提示", selectCoverPic:"选择封面图片",
+            fileBtn:"文件", warnTitle:"提示", selectCoverPic:"选择封面图片",
             exampleLabel:"示例：", importTip:"提示：cover_path 为空则显示无图；types 为 JSON 数组字符串格式；play_time 为游玩时长（小时）；start_date/finish_date 格式为 YYYY-MM-DD",
             aaBbText:"AaBb 文字", aaBbDesc:"AaBb 说明",
             cBlue:"天蓝", cGreen:"绿", cYellow:"黄", cPink:"粉", cBlack:"黑", cGray:"灰", cWhite:"白",
@@ -118,7 +123,7 @@ Window {
             exportDefaultName:"galgame遊玩記錄",
             yearStr:"年", monthStr:"月", dayStr:"日", lunarPrefix:"農曆",
             noMatchGame:"沒找到匹配的遊戲", emptyGameList:"還沒有遊戲\n點上方「➕ 新增」開始記錄",
-            fileBtn:"📁 檔案", warnTitle:"提示", selectCoverPic:"選擇封面圖片",
+            fileBtn:"檔案", warnTitle:"提示", selectCoverPic:"選擇封面圖片",
             exampleLabel:"範例：", importTip:"提示：cover_path 為空則顯示無圖；types 為 JSON 陣列字串格式；play_time 為遊玩時長（小時）；start_date/finish_date 格式為 YYYY-MM-DD",
             aaBbText:"AaBb 文字", aaBbDesc:"AaBb 說明",
             cBlue:"天藍", cGreen:"綠", cYellow:"黃", cPink:"粉", cBlack:"黑", cGray:"灰", cWhite:"白",
@@ -192,7 +197,7 @@ Window {
             exportDefaultName:"galgame Play Records",
             yearStr:"-", monthStr:"-", dayStr:"", lunarPrefix:"Lunar",
             noMatchGame:"No matching games found", emptyGameList:"No games yet\nClick「➕ Add」above to start recording",
-            fileBtn:"📁 File", warnTitle:"Notice", selectCoverPic:"Select Cover Image",
+            fileBtn:"File", warnTitle:"Notice", selectCoverPic:"Select Cover Image",
             exampleLabel:"Example:", importTip:"Tip: empty cover_path shows no image; types is a JSON array string; play_time is play time in hours; start_date/finish_date format is YYYY-MM-DD",
             aaBbText:"AaBb Text", aaBbDesc:"AaBb Desc",
             cBlue:"Blue", cGreen:"Green", cYellow:"Yellow", cPink:"Pink", cBlack:"Black", cGray:"Gray", cWhite:"White",
@@ -266,7 +271,7 @@ Window {
             exportDefaultName:"galgameプレイ記録",
             yearStr:"年", monthStr:"月", dayStr:"日", lunarPrefix:"農暦",
             noMatchGame:"一致するゲームが見つかりません", emptyGameList:"まだゲームがありません\n上の「➕ 追加」をクリックして記録を開始",
-            fileBtn:"📁 ファイル", warnTitle:"通知", selectCoverPic:"カバー画像選択",
+            fileBtn:"ファイル", warnTitle:"通知", selectCoverPic:"カバー画像選択",
             exampleLabel:"例：", importTip:"ヒント：cover_path が空なら画像なし；types は JSON 配列文字列；play_time はプレイ時間（時間）；start_date/finish_date は YYYY-MM-DD 形式",
             aaBbText:"AaBb テキスト", aaBbDesc:"AaBb 説明",
             cBlue:"青", cGreen:"緑", cYellow:"黄", cPink:"ピンク", cBlack:"黒", cGray:"灰", cWhite:"白",
@@ -633,11 +638,15 @@ Window {
         }
     }
 
-    component BtnOk: Button {
-        text: "OK"; highlighted: true
+    // 主操作按钮（accent 背景 + 白字），BtnOk/BtnSave/BtnImport 仅为预设默认文案的别名
+    component BtnPrimary: Button {
+        highlighted: true
         background: Rectangle { color: cAccent; radius: 4; implicitWidth: 72; implicitHeight: 32 }
         palette.buttonText: "#ffffff"
     }
+    component BtnOk: BtnPrimary { text: "OK" }
+    component BtnSave: BtnPrimary { text: "Save" }
+    component BtnImport: BtnPrimary { text: "Import" }
 
     component BtnCancel: Button {
         text: "Cancel"; flat: true
@@ -648,18 +657,6 @@ Window {
     component BtnClose: Button {
         text: "Close"; flat: true
         background: Rectangle { color: "transparent"; radius: 4; border.color: cBorder; border.width: 1; implicitWidth: 72; implicitHeight: 32 }
-    }
-
-    component BtnSave: Button {
-        text: "Save"; highlighted: true
-        background: Rectangle { color: cAccent; radius: 4; implicitWidth: 72; implicitHeight: 32 }
-        palette.buttonText: "#ffffff"
-    }
-
-    component BtnImport: Button {
-        text: "Import"; highlighted: true
-        background: Rectangle { color: cAccent; radius: 4; implicitWidth: 72; implicitHeight: 32 }
-        palette.buttonText: "#ffffff"
     }
 
     // 对话框底部按钮栏（居中）
@@ -691,25 +688,161 @@ Window {
         Timer { id: sbTimer; interval: 800; onTriggered: if (!sb.hovered && !sb.pressed) sb.opacity = 0.0 }
     }
 
-    // ===== 背景图层（静态）=====
-    Image {
-        id: bgImage; anchors.fill: parent; z: -1
-        source: root.bgImagePath.length > 0 && !root.bgImagePath.toLowerCase().endsWith(".gif") && !isVideoFile(root.bgImagePath) ? "file:///" + root.bgImagePath : ""
-        fillMode: Image.PreserveAspectCrop; visible: root.bgImagePath.length > 0 && !root.bgImagePath.toLowerCase().endsWith(".gif") && !isVideoFile(root.bgImagePath)
-        opacity: root.bgOpacity; layer.enabled: root.bgBlur > 0 && visible
-        layer.effect: MultiEffect { blurEnabled: true; blur: root.bgBlur; blurMax: 64 }
+
+    // 圆形手柄滑块：细线轨道 + 主题色已选区 + 16×16 圆球手柄（root. 前缀修复子 Window 作用域问题）
+    // implicitWidth/implicitHeight 必须提供，否则 Slider 在布局中 implicit 尺寸归零导致不可见
+    component RoundSlider: Slider {
+        id: rs
+        background: Rectangle {
+            x: rs.leftPadding; y: rs.topPadding + rs.availableHeight / 2 - 2
+            width: rs.availableWidth; height: 4; radius: 2
+            implicitWidth: 200; implicitHeight: 20
+            color: Qt.rgba(root.cBorder.r, root.cBorder.g, root.cBorder.b, 0.6)
+            Rectangle {
+                width: rs.visualPosition * rs.availableWidth; height: parent.height; radius: 2
+                color: root.cAccent
+            }
+        }
+        handle: Rectangle {
+            x: rs.leftPadding + rs.visualPosition * (rs.availableWidth - width)
+            y: rs.topPadding + rs.availableHeight / 2 - height / 2
+            width: 16; height: 16; radius: 8
+            color: rs.pressed ? Qt.lighter(root.cAccent, 1.2) : root.cAccent
+            border.color: "#ffffff"; border.width: 2
+            Behavior on color { ColorAnimation { duration: 100 } }
+        }
     }
-    // ===== 背景图层（GIF 动画）=====
-    AnimatedImage {
-        id: bgGif; anchors.fill: parent; z: -1
-        source: root.bgImagePath.length > 0 && root.bgImagePath.toLowerCase().endsWith(".gif") ? "file:///" + root.bgImagePath : ""
-        fillMode: Image.PreserveAspectCrop; visible: root.bgImagePath.length > 0 && root.bgImagePath.toLowerCase().endsWith(".gif")
-        opacity: root.bgOpacity; layer.enabled: root.bgBlur > 0 && visible
-        layer.effect: MultiEffect { blurEnabled: true; blur: root.bgBlur; blurMax: 64 }
+
+    // 无框对话框拖动栏：透明背景 + 标题 + ✕关闭按钮（hover 红底白字）
+    // 颜色属性用 root. 前缀访问根 Window 自定义属性（inline component 作用域限制）
+    component FramelessDragBar: Rectangle {
+        id: dragBar
+        property var dialogWindow: null  // 关联的 Window 对象，用于关闭
+        anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
+        height: 38; z: 50
+        color: "transparent"  // 透明背景，无标题无分隔线
+        // 拖动区：整个拖动栏可拖动窗口
+        MouseArea { anchors.fill: parent; onPressed: { if (dialogWindow) dialogWindow.startSystemMove() } }
+        // ✕ 关闭按钮（右上角，hover 红底白字）
+        Button {
+            id: dragBarClose
+            text: "✕"; flat: true; width: 32; height: 28
+            anchors.right: parent.right; anchors.rightMargin: 6; anchors.verticalCenter: parent.verticalCenter
+            background: Rectangle {
+                color: dragBarClose.hovered ? "#ff4444" : "transparent"
+                radius: 6
+                Behavior on color { ColorAnimation { duration: 150 } }
+            }
+            palette.buttonText: dragBarClose.hovered ? "#ffffff" : root.cSub
+            onClicked: { if (dialogWindow) dialogWindow.close() }
+        }
+    }
+
+    component ColorPickerDialog: Window {
+        id: cpSelf
+        property color initialColor                     // 打开时取色的源属性
+        property var presetColors: []                   // 预设色板
+        property string previewText: ""                 // 预览区文字（空=纯色块）
+        property color previewBgColor: selectedColor    // 预览区背景色
+        property int previewFontSize: 16                // 预览区字号
+        property bool previewOutline: true              // 预览区文字是否有描边
+        signal accepted(color c)                        // 点击 OK 时发出
+
+        modality: Qt.WindowModal
+        transientParent: appearanceDialog
+        flags: Qt.FramelessWindowHint | Qt.Window
+        width: 340; height: 540
+        minimumWidth: 320; minimumHeight: 520
+        color: "transparent"
+        x: root.x + (root.width - width) / 2
+        y: root.y + (root.height - height) / 2
+        palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
+        property color selectedColor: initialColor
+        onVisibleChanged: if (visible) selectedColor = initialColor
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: cpSelf }
+        Flickable {
+            anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; anchors.bottomMargin: 52
+            clip: true; contentWidth: width; contentHeight: pickerCol.implicitHeight
+            boundsBehavior: Flickable.StopAtBounds
+            ScrollBar.vertical: MainSB {}
+            ColumnLayout {
+                id: pickerCol; width: parent.width; spacing: 10
+                Rectangle { Layout.fillWidth: true; height: 40; radius: 8; color: previewBgColor; border.color: cBorder; border.width: 1
+                    Text { visible: previewText !== ""; anchors.centerIn: parent; text: previewText; color: selectedColor; font.pixelSize: previewFontSize
+                        style: previewOutline ? Text.Outline : Text.Normal
+                        styleColor: Qt.rgba(1-selectedColor.r, 1-selectedColor.g, 1-selectedColor.b, 0.3) }
+                }
+                Loader {
+                    id: pickerLoader
+                    sourceComponent: hsvPickerComp
+                    Layout.fillWidth: true; Layout.preferredHeight: 180
+                    onLoaded: { item.selectedColor = selectedColor }
+                }
+                Connections { target: pickerLoader.item; function onSelectedColorChanged() { selectedColor = pickerLoader.item.selectedColor } }
+                Binding { target: pickerLoader.item; property: "selectedColor"; value: selectedColor; when: pickerLoader.item && !pickerLoader.item.internalChange }
+                Label { text: tt("presetColors"); color: cSub; font.pixelSize: 12 }
+                Flow { Layout.fillWidth: true; spacing: 6
+                    Repeater {
+                        model: presetColors
+                        delegate: Rectangle {
+                            width: 28; height: 28; radius: 5; color: modelData
+                            border.width: selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? 3 : 1
+                            border.color: selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? cAccent : cBorder
+                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: selectedColor = modelData }
+                        }
+                    }
+                }
+                Label { text: tt("hexCode"); color: cSub; font.pixelSize: 12 }
+                TextField {
+                    id: hexInput; Layout.fillWidth: true
+                    text: selectedColor.toString().toUpperCase()
+                    placeholderText: "#RRGGBB"
+                    background: InputBg {}
+                    onEditingFinished: { var t = text.trim(); if (/^#[0-9a-fA-F]{6}$/.test(t) || /^#[0-9a-fA-F]{8}$/.test(t)) selectedColor = t; else text = selectedColor.toString().toUpperCase(); }
+                }
+            }
+        }
+        Row {
+            anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
+            anchors.margins: 12; spacing: 8
+            Item { width: parent.width - 180; height: 1 }
+            BtnCancel { onClicked: close() }
+            BtnOk { onClicked: { accepted(selectedColor); close(); } }
+        }
+    }
+
+    // ===== 背景图层（静态）— 分层结构：外层 Item 管 opacity，内层 Image 管 layer.blur
+    // 解决 opacity + layer.effect 在同一 Item 上冲突导致图片消失的问题（Qt 6 layer 纹理合成顺序问题）
+    // layer.enabled 恒等于 visible 避免模糊值变化时 FBO 销毁重建导致闪烁
+    Item {
+        id: bgImageWrap; parent: bgRect; anchors.fill: parent; z: -1
+        opacity: root.bgOpacity
+        visible: root.bgImagePath.length > 0 && !root.bgImagePath.toLowerCase().endsWith(".gif") && !isVideoFile(root.bgImagePath)
+        Image {
+            id: bgImage; anchors.fill: parent
+            source: bgImageWrap.visible ? "file:///" + root.bgImagePath : ""
+            fillMode: Image.PreserveAspectCrop
+            layer.enabled: bgImageWrap.visible   // 恒启用（visible 时），避免 blur=0 临界点切换 FBO 闪烁
+            layer.effect: MultiEffect { blurEnabled: root.bgBlur > 0; blur: root.bgBlur; blurMax: 64 }
+        }
+    }
+    // ===== 背景图层（GIF 动画）— 同样分层结构 =====
+    Item {
+        id: bgGifWrap; parent: bgRect; anchors.fill: parent; z: -1
+        opacity: root.bgOpacity
+        visible: root.bgImagePath.length > 0 && root.bgImagePath.toLowerCase().endsWith(".gif")
+        AnimatedImage {
+            id: bgGif; anchors.fill: parent
+            source: bgGifWrap.visible ? "file:///" + root.bgImagePath : ""
+            fillMode: Image.PreserveAspectCrop
+            layer.enabled: bgGifWrap.visible
+            layer.effect: MultiEffect { blurEnabled: root.bgBlur > 0; blur: root.bgBlur; blurMax: 64 }
+        }
     }
     // ===== 背景图层（视频）=====
     VideoOutput {
-        id: bgVideo; anchors.fill: parent; z: -1
+        id: bgVideo; parent: bgRect; anchors.fill: parent; z: -1
         visible: root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)
         fillMode: VideoOutput.PreserveAspectCrop   // 与图片保持一致的应用模式
         // 视频背景不使用透明度/模糊度（外观对话框在视频模式下已隐藏这两个滑块）
@@ -738,18 +871,29 @@ Window {
         }
     }
 
-    // ===== 顶部工具栏 =====
+    // ===== 顶部工具栏（常驻显示，无边框透明，parent:bgRect 被圆角裁剪）=====
     Rectangle {
         id: toolbar
+        parent: bgRect
         anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
-        height: 46; color: Qt.rgba(cCard.r, cCard.g, cCard.b, 0.85); border.color: cBorder; border.width: 1
-        Rectangle { anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right; height: 3; color: cAccent; radius: 2 }
-        Label { anchors.left: parent.left; anchors.leftMargin: 14; anchors.verticalCenter: parent.verticalCenter; text: "🎮 " + tt("appTitle"); font.bold: true; font.pixelSize: 17; color: cAccent }
+        height: 46; z: 31
+        color: "transparent"; border.width: 0
+
+        // 窗口拖动区：工具栏左侧空白区域按住可拖动窗口（startSystemMove）
+        MouseArea {
+            anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom
+            anchors.right: btnRow.left
+            onPressed: root.startSystemMove()
+        }
+
         Row {
+            id: btnRow
             anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter; spacing: 4
             // 语言切换（地球图标 + Menu 下拉）
             Button {
                 text: "🌍"; flat: true
+                layer.enabled: true
+                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
                 background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36 }
                 palette.buttonText: cAccent
                 onClicked: langMenu.open()
@@ -765,6 +909,8 @@ Window {
             // 夜晚模式切换（月亮=夜晚激活 / 太阳=白天）
             Button {
                 text: root.isDark ? "🌙" : "☀️"; flat: true
+                layer.enabled: true
+                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
                 background: Rectangle { color: root.isDark ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.3) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36 }
                 palette.buttonText: cAccent
                 onClicked: {
@@ -782,21 +928,54 @@ Window {
             }
             Button {
                 text: "🕐"; flat: true
+                layer.enabled: true
+                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
                 background: Rectangle { color: clockVisible ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.3) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36 }
                 palette.buttonText: cAccent
                 onClicked: clockVisible = !clockVisible
             }
             Button {
                 text: "⚙️"; flat: true
+                layer.enabled: true
+                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
                 background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36 }
                 onClicked: settingsDialog.show()
+            }
+            // 窗口控制按钮（最小化/最大化/关闭）
+            Button {
+                id: minBtn
+                text: "—"; flat: true
+                layer.enabled: true
+                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
+                background: Rectangle { color: minBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: minBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
+                palette.buttonText: minBtn.hovered ? "#ffffff" : cAccent
+                onClicked: root.showMinimized()
+            }
+            Button {
+                id: maxBtn
+                text: root.visibility === Window.Maximized ? "❐" : "☐"; flat: true
+                layer.enabled: true
+                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
+                background: Rectangle { color: maxBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: maxBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
+                palette.buttonText: maxBtn.hovered ? "#ffffff" : cAccent
+                onClicked: root.visibility === Window.Maximized ? root.showNormal() : root.showMaximized()
+            }
+            Button {
+                id: closeBtn
+                text: "✕"; flat: true
+                layer.enabled: true
+                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
+                background: Rectangle { color: closeBtn.hovered ? "#ff4444" : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: closeBtn.hovered ? "#ff4444" : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
+                palette.buttonText: closeBtn.hovered ? "#ffffff" : cAccent
+                onClicked: root.close()
             }
         }
     }
 
-    // ===== 主页面可滚动区域 =====
+    // ===== 主页面可滚动区域（锚定 toolbar.bottom，不与时钟栏重叠）=====
     Flickable {
         id: mainScroll
+        parent: bgRect
         anchors.top: toolbar.bottom; anchors.left: parent.left; anchors.right: parent.right
         // 底部留出空间给视频声音模块（仅视频背景时显示）
         anchors.bottom: videoSoundBar.visible ? videoSoundBar.top : parent.bottom
@@ -1005,6 +1184,7 @@ Window {
     // ===== 视频背景声音模块（仅视频背景时显示，固定在主页面底部）=====
     Rectangle {
         id: videoSoundBar
+        parent: bgRect
         anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
         height: 44
         visible: root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)
@@ -1026,7 +1206,7 @@ Window {
             // 音量标签
             Label { text: tt("videoVolume") + "：" + Math.round(root.bgVideoVolume * 100) + "%"; color: cText; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter }
             // 音量滑块
-            Slider {
+            RoundSlider {
                 from: 0.0; to: 1.0; value: root.bgVideoVolume
                 onMoved: root.bgVideoVolume = value
                 width: 180
@@ -1044,15 +1224,17 @@ Window {
         id: addDialog
         title: tt("addTitle")
         modality: Qt.WindowModal
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 400; height: 520
         minimumWidth: 380; minimumHeight: 480
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: addDialog }
         Flickable {
-            anchors.fill: parent; anchors.margins: 12; clip: true; contentWidth: width; contentHeight: addCol.implicitHeight
+            anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; clip: true; contentWidth: width; contentHeight: addCol.implicitHeight
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: MainSB {}
             ColumnLayout { id: addCol; width: parent.width; spacing: 10
@@ -1098,16 +1280,17 @@ Window {
         title: tt("editTitle")
         modality: Qt.WindowModal
         transientParent: gameDetailDialog
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 400; height: 520
         minimumWidth: 380; minimumHeight: 480
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
-        property int gameId: -1
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: editDialog }
         Flickable {
-            anchors.fill: parent; anchors.margins: 12; clip: true; contentWidth: width; contentHeight: editCol.implicitHeight
+            anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; clip: true; contentWidth: width; contentHeight: editCol.implicitHeight
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: MainSB {}
             ColumnLayout { id: editCol; width: parent.width; spacing: 10
@@ -1155,9 +1338,9 @@ Window {
     // ===== 删除确认（嵌套于游戏详情窗，Window+transientParent）=====
     Window {
         id: deleteDialog
-        flags: Qt.Dialog | Qt.WindowTitleHint
         transientParent: gameDetailDialog
-        color: cBg
+        flags: Qt.FramelessWindowHint | Qt.Window
+        color: "transparent"
         title: tt("deleteTitle")
         width: 320; height: 180
         x: gameDetailDialog.x + Math.max(24, (gameDetailDialog.width - width) / 2)
@@ -1168,8 +1351,10 @@ Window {
         onVisibleChanged: {
             if (!visible && gameDetailDialog.visible) gameDetailDialog.requestActivate()
         }
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: deleteDialog }
         Column {
-            anchors.fill: parent; anchors.margins: 16; spacing: 16
+            anchors.fill: parent; anchors.margins: 16; anchors.topMargin: 38; spacing: 16
             Item { width: 1; height: 4 }
             Text {
                 text: tt("deleteConfirm", deleteDialog.gameName)
@@ -1200,10 +1385,10 @@ Window {
         id: gameDetailDialog
         title: tt("gameDetail")
         modality: Qt.WindowModal
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 820; height: 580
         minimumWidth: 600; minimumHeight: 420
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
 
@@ -1393,12 +1578,14 @@ Window {
         onClosing: {}
         onVisibleChanged: {}
 
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: gameDetailDialog }
         Rectangle {
-            anchors.fill: parent; color: root.cBg
+            anchors.fill: parent; color: "transparent"
 
             // 主体左右布局
             Row {
-                anchors.fill: parent; anchors.margins: 12; spacing: 12
+                anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; spacing: 12
 
                 // ===== 左侧：封面（宽度随图片比例自适应，最大 40%）=====
                 Rectangle {
@@ -1789,9 +1976,9 @@ Window {
         // ===== 回忆编辑对话框（改为 Window，彻底解决居中问题）=====
         Window {
             id: memoriesEditDialog
-            flags: Qt.Dialog | Qt.WindowTitleHint
             transientParent: gameDetailDialog
-            color: cBg
+            flags: Qt.FramelessWindowHint | Qt.Window
+            color: "transparent"
             width: 680; height: 500
             title: tt("editMemories")
 
@@ -1867,20 +2054,13 @@ Window {
                 }
             }
 
-            // 自定义标题栏（可拖拽）
-            Rectangle {
-                id: memTitleBar
-                anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right
-                height: 36; color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.15)
-                Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: cBorder }
-                Text { anchors.centerIn: parent; text: tt("editMemories"); color: cText; font.bold: true; font.pixelSize: 13 }
-                MouseArea { anchors.fill: parent; onPressed: memoriesEditDialog.startSystemMove() }
-            }
 
+            Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+            FramelessDragBar { dialogWindow: memoriesEditDialog }
             // 主体：左右布局
             Item {
-                anchors.top: memTitleBar.bottom; anchors.bottom: memFooter.top; anchors.left: parent.left; anchors.right: parent.right
-                anchors.margins: 10
+                anchors.top: parent.top; anchors.bottom: memFooter.top; anchors.left: parent.left; anchors.right: parent.right
+                anchors.margins: 10; anchors.topMargin: 38
 
                 // ===== 左侧：添加按钮(顶部) + 缩略图列表(拖拽排序) + 删除按钮(底部) =====
                 Rectangle {
@@ -2134,7 +2314,7 @@ Window {
                             RowLayout {
                                 Layout.fillWidth: true; spacing: 8
                                 Text { text: tt("imageScale"); color: cText; font.pixelSize: 11; Layout.preferredWidth: 36; elide: Text.ElideRight }
-                                Slider {
+                                RoundSlider {
                                     from: 0.1; to: 10.0; stepSize: 0.05; value: memoriesEditDialog.curScale; enabled: memoriesEditDialog.currentIdx >= 0
                                     onMoved: {
                                         memoriesEditDialog.curScale = value;
@@ -2184,13 +2364,13 @@ Window {
                             RowLayout {
                                 Layout.fillWidth: true; spacing: 8
                                 Text { text: tt("playInterval"); color: cText; font.pixelSize: 11; Layout.preferredWidth: 60; elide: Text.ElideRight }
-                                Slider { from: 500; to: 10000; stepSize: 100; value: memoriesEditDialog.ssInterval; onMoved: memoriesEditDialog.ssInterval = value; Layout.fillWidth: true }
+                                RoundSlider { from: 500; to: 10000; stepSize: 100; value: memoriesEditDialog.ssInterval; onMoved: memoriesEditDialog.ssInterval = value; Layout.fillWidth: true }
                                 Text { text: (memoriesEditDialog.ssInterval / 1000).toFixed(1) + tt("seconds"); color: cSub; font.pixelSize: 11; Layout.preferredWidth: 52; horizontalAlignment: Text.AlignHCenter }
                             }
                             RowLayout {
                                 Layout.fillWidth: true; spacing: 8
                                 Text { text: tt("fadeDuration"); color: cText; font.pixelSize: 11; Layout.preferredWidth: 60; elide: Text.ElideRight }
-                                Slider { from: 0; to: 3000; stepSize: 50; value: memoriesEditDialog.ssFade; onMoved: memoriesEditDialog.ssFade = value; Layout.fillWidth: true }
+                                RoundSlider { from: 0; to: 3000; stepSize: 50; value: memoriesEditDialog.ssFade; onMoved: memoriesEditDialog.ssFade = value; Layout.fillWidth: true }
                                 Text { text: (memoriesEditDialog.ssFade / 1000).toFixed(1) + tt("seconds"); color: cSub; font.pixelSize: 11; Layout.preferredWidth: 52; horizontalAlignment: Text.AlignHCenter }
                             }
                         }
@@ -2266,9 +2446,9 @@ Window {
     // 详情窗类型编辑对话框（列表式：每行可编辑+删除）
     Window {
         id: typeEditDialog
-        flags: Qt.Dialog | Qt.WindowTitleHint
         transientParent: gameDetailDialog
-        color: cBg
+        flags: Qt.FramelessWindowHint | Qt.Window
+        color: "transparent"
         width: 360; height: 340
         title: tt("editType")
 
@@ -2287,8 +2467,10 @@ Window {
         onVisibleChanged: {
             if (!visible && gameDetailDialog.visible) gameDetailDialog.requestActivate()
         }
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: typeEditDialog }
         Column {
-            anchors.fill: parent; anchors.margins: 12; spacing: 10
+            anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; spacing: 10
 
             // 标题
             Text { text: tt("currentTypes"); color: cSub; font.pixelSize: 11 }
@@ -2430,15 +2612,17 @@ Window {
         title: tt("exportTitle")
         modality: Qt.WindowModal
         transientParent: settingsDialog
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 440; height: 320
         minimumWidth: 400; minimumHeight: 280
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: exportFormatDialog }
         Column {
-            anchors.fill: parent; anchors.margins: 16; spacing: 10
+            anchors.fill: parent; anchors.margins: 16; anchors.topMargin: 38; spacing: 10
             Flickable {
                 width: parent.width; height: parent.height - 50; clip: true
                 contentWidth: width; contentHeight: exportCol.height
@@ -2480,15 +2664,17 @@ Window {
         title: tt("importTitle")
         modality: Qt.WindowModal
         transientParent: settingsDialog
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 480; height: 460
         minimumWidth: 440; minimumHeight: 400
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: importTipDialog }
         Flickable {
-            anchors.fill: parent; anchors.margins: 12; clip: true; contentWidth: width; contentHeight: importCol.height
+            anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; clip: true; contentWidth: width; contentHeight: importCol.height
             ScrollBar.vertical: MainSB {}
             Column { id: importCol; spacing: 10; width: importTipDialog.width - 48
                 Label { width: parent.width; wrapMode: Text.Wrap; color: cText; font.pixelSize: 13; text: tt("importDesc") }
@@ -2513,15 +2699,17 @@ Window {
         id: settingsDialog
         title: tt("settings")
         modality: Qt.WindowModal
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 400; height: 400
         minimumWidth: 380; minimumHeight: 360
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: settingsDialog }
         Column {
-            anchors.fill: parent; anchors.margins: 16; spacing: 12
+            anchors.fill: parent; anchors.margins: 16; anchors.topMargin: 38; spacing: 12
             Flickable {
                 width: parent.width; height: parent.height - 50; clip: true
                 contentWidth: width; contentHeight: settingsCol.height
@@ -2529,7 +2717,7 @@ Window {
                 Column { id: settingsCol; width: parent.width; spacing: 14
                     BtnGhost { text: "👕 " + tt("appearance"); width: parent.width; onClicked: { appearanceDialog.show(); } }
                     // 文档功能（原工具栏文件按钮移入此处）
-                    Label { text: "📁 " + tt("fileBtn"); color: cText; font.pixelSize: 14; width: parent.width }
+                    Label { text: tt("fileBtn"); color: cText; font.pixelSize: 14; width: parent.width }
                     Column { width: parent.width; spacing: 6; leftPadding: 12
                         BtnGhost { text: tt("jsonFormat"); width: parent.width - 12; onClicked: { settingsDialog.close(); exportDialog.openWith("json"); } }
                         BtnGhost { text: tt("txtFormat"); width: parent.width - 12; onClicked: { settingsDialog.close(); exportDialog.openWith("txt"); } }
@@ -2567,15 +2755,17 @@ Window {
         title: tt("appearance")
         modality: Qt.WindowModal
         transientParent: settingsDialog
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 620; height: 540
         minimumWidth: 560; minimumHeight: 480
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: appearanceDialog }
         Column {
-            anchors.fill: parent; anchors.margins: 15; spacing: 10
+            anchors.fill: parent; anchors.margins: 15; anchors.topMargin: 38; spacing: 10
             Flickable {
                 width: parent.width; height: parent.height - 50; clip: true
                 contentWidth: width; contentHeight: appearCol.height
@@ -2696,11 +2886,11 @@ Window {
                     }
                     Label { text: tt("bgOpacity") + "：" + Math.round(root.bgOpacity*100)+"%"; color: cText; font.pixelSize: 12
                         visible: !(root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)) }
-                    Slider { from:0; to:1; value:root.bgOpacity; onMoved:root.bgOpacity=value; width:parent.width
+                    RoundSlider { from:0; to:1; value:root.bgOpacity; onMoved:root.bgOpacity=value; width:parent.width
                         visible: !(root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)) }
                     Label { text: tt("bgBlur") + "：" + Math.round(root.bgBlur*100)+"%"; color: cText; font.pixelSize: 12
                         visible: !(root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)) }
-                    Slider { from:0; to:1; value:root.bgBlur; onMoved:root.bgBlur=value; width:parent.width
+                    RoundSlider { from:0; to:1; value:root.bgBlur; onMoved:root.bgBlur=value; width:parent.width
                         visible: !(root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)) }
                 }
             }
@@ -2717,17 +2907,19 @@ Window {
         title: tt("bgHistory")
         modality: Qt.WindowModal
         transientParent: appearanceDialog
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 540; height: 480
         minimumWidth: 500; minimumHeight: 400
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
         property var images: []
         function refresh() { images = dbManager.getBgImages() }
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: bgHistoryDialog }
         Flickable {
-            anchors.fill: parent; anchors.margins: 12; anchors.bottomMargin: 52
+            anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; anchors.bottomMargin: 52
             clip: true; contentWidth: width; contentHeight: height
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: MainSB {}
@@ -2787,10 +2979,10 @@ Window {
         title: tt("editBg")
         modality: Qt.WindowModal
         transientParent: bgHistoryDialog
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 580; height: 560
         minimumWidth: 540; minimumHeight: 500
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
@@ -2801,8 +2993,10 @@ Window {
         function openWith(id, path, op, bl) {
             targetId = id; imagePath = path; editOpacity = op; editBlur = bl; show();
         }
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: editBgDialog }
         Column {
-            anchors.fill: parent; anchors.margins: 12; spacing: 10
+            anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; spacing: 10
             Flickable {
                 width: parent.width; height: parent.height - 60; clip: true
                 contentWidth: width; contentHeight: editBgCol.height
@@ -2830,13 +3024,13 @@ Window {
                     Row {
                         width: parent.width; spacing: 8
                         Label { text: tt("bgOpacity"); color: cText; font.pixelSize: 13; width: 60; anchors.verticalCenter: parent.verticalCenter }
-                        Slider { from: 0; to: 1; value: editBgDialog.editOpacity; onMoved: editBgDialog.editOpacity = value; width: parent.width - 60 - 50 }
+                        RoundSlider { from: 0; to: 1; value: editBgDialog.editOpacity; onMoved: editBgDialog.editOpacity = value; width: parent.width - 60 - 50 }
                         Label { text: Math.round(editBgDialog.editOpacity * 100) + "%"; color: cSub; font.pixelSize: 12; width: 50; horizontalAlignment: Text.AlignRight; anchors.verticalCenter: parent.verticalCenter }
                     }
                     Row {
                         width: parent.width; spacing: 8
                         Label { text: tt("bgBlur"); color: cText; font.pixelSize: 13; width: 60; anchors.verticalCenter: parent.verticalCenter }
-                        Slider { from: 0; to: 1; value: editBgDialog.editBlur; onMoved: editBgDialog.editBlur = value; width: parent.width - 60 - 50 }
+                        RoundSlider { from: 0; to: 1; value: editBgDialog.editBlur; onMoved: editBgDialog.editBlur = value; width: parent.width - 60 - 50 }
                         Label { text: Math.round(editBgDialog.editBlur * 100) + "%"; color: cSub; font.pixelSize: 12; width: 50; horizontalAlignment: Text.AlignRight; anchors.verticalCenter: parent.verticalCenter }
                     }
                     Label { text: tt("dragToMove"); color: cSub; font.pixelSize: 11 }
@@ -2868,17 +3062,19 @@ Window {
         title: tt("deleteBg")
         modality: Qt.WindowModal
         transientParent: bgHistoryDialog
+        flags: Qt.FramelessWindowHint | Qt.Window
         width: 340; height: 160
         minimumWidth: 320; minimumHeight: 140
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
         property int targetId: -1; property string targetPath: ""
         property bool accepted: false
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: deleteBgDialog }
         Column {
-            anchors.fill: parent; anchors.margins: 16; spacing: 12
+            anchors.fill: parent; anchors.margins: 16; anchors.topMargin: 38; spacing: 12
             Label { text: tt("deleteConfirm", tt("bgImage")); color: cText; width: parent.width; wrapMode: Text.Wrap }
             Row { width: parent.width; spacing: 8
                 Item { width: parent.width - 180; height: 1 }
@@ -2899,14 +3095,14 @@ Window {
         id: cropDialog
         title: cropDialog.mode === "cover" || cropDialog.mode === "coverDetail" ? tt("coverCrop") : tt("crop")
         modality: Qt.WindowModal
+        flags: Qt.FramelessWindowHint | Qt.Window
         transientParent: cropDialog.mode === "cover" ? editDialog
                         : cropDialog.mode === "coverDetail" ? gameDetailDialog
                         : cropDialog.mode === "bg" ? (bgHistoryDialog.visible ? bgHistoryDialog : (appearanceDialog.visible ? appearanceDialog : root))
                         : root
         width: 640; height: 560
         minimumWidth: 600; minimumHeight: 520
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+        color: "transparent"
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
@@ -2956,8 +3152,10 @@ Window {
             close();
         }
 
+        Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
+        FramelessDragBar { dialogWindow: cropDialog }
         Column {
-            anchors.fill: parent; anchors.margins: 12; spacing: 12
+            anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; spacing: 12
             Rectangle {
                 id: cropContainer; width: parent.width; height: 380; color: "black"; clip: true
                 Image { id: imagePreview; anchors.centerIn: parent; width: parent.width; height: parent.height; fillMode: Image.PreserveAspectFit; source: cropDialog.sourcePath.length > 0 ? "file:///" + cropDialog.sourcePath : ""; onStatusChanged: if (status === Image.Ready) cropDialog.calcLayout() }
@@ -3243,255 +3441,41 @@ Window {
             }
         }
     }
-    // ===== 自定义颜色选择窗口（子 Window）=====
-    Window {
+    // ===== 自定义颜色选择窗口（4 个实例共用 ColorPickerDialog 组件）=====
+    ColorPickerDialog {
         id: customAccentDialog
         title: tt("customAccent")
-        modality: Qt.WindowModal
-        transientParent: appearanceDialog
-        width: 340; height: 540
-        minimumWidth: 320; minimumHeight: 520
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
-        x: root.x + (root.width - width) / 2
-        y: root.y + (root.height - height) / 2
-        palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
-        property color selectedColor: root.customAccent
-        onVisibleChanged: if (visible) selectedColor = root.customAccent
-        Flickable {
-            anchors.fill: parent; anchors.margins: 12; anchors.bottomMargin: 52
-            clip: true; contentWidth: width; contentHeight: accentCol.implicitHeight
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: MainSB {}
-            ColumnLayout {
-                id: accentCol; width: parent.width; spacing: 10
-                Rectangle { Layout.fillWidth: true; height: 40; radius: 8; color: customAccentDialog.selectedColor; border.color: cBorder; border.width: 1 }
-                Loader {
-                    id: accentPickerLoader
-                    sourceComponent: hsvPickerComp
-                    Layout.fillWidth: true; Layout.preferredHeight: 180
-                    onLoaded: { item.selectedColor = customAccentDialog.selectedColor }
-                }
-                Connections { target: accentPickerLoader.item; function onSelectedColorChanged() { customAccentDialog.selectedColor = accentPickerLoader.item.selectedColor } }
-                Binding { target: accentPickerLoader.item; property: "selectedColor"; value: customAccentDialog.selectedColor; when: accentPickerLoader.item && !accentPickerLoader.item.internalChange }
-                Label { text: tt("presetColors"); color: cSub; font.pixelSize: 12 }
-                Flow { Layout.fillWidth: true; spacing: 6
-                    Repeater {
-                        model: ["#ff4444", "#ff8844", "#ffc94d", "#5bd06d", "#27d2bf", "#3a9fff", "#9b5de5", "#ff7aa8", "#222222", "#888888", "#bbbbbb", "#ffffff"]
-                        delegate: Rectangle {
-                            width: 28; height: 28; radius: 5; color: modelData
-                            border.width: customAccentDialog.selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? 3 : 1
-                            border.color: customAccentDialog.selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? cAccent : cBorder
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: customAccentDialog.selectedColor = modelData }
-                        }
-                    }
-                }
-                Label { text: tt("hexCode"); color: cSub; font.pixelSize: 12 }
-                TextField {
-                    id: accentHexInput; Layout.fillWidth: true
-                    text: customAccentDialog.selectedColor.toString().toUpperCase()
-                    placeholderText: "#RRGGBB"
-                    background: InputBg {}
-                    onEditingFinished: { var t = text.trim(); if (/^#[0-9a-fA-F]{6}$/.test(t) || /^#[0-9a-fA-F]{8}$/.test(t)) customAccentDialog.selectedColor = t; else text = customAccentDialog.selectedColor.toString().toUpperCase(); }
-                }
-            }
-        }
-        Row {
-            anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
-            anchors.margins: 12; spacing: 8
-            Item { width: parent.width - 180; height: 1 }
-            BtnCancel { onClicked: customAccentDialog.close() }
-            BtnOk { onClicked: { root.customAccent = customAccentDialog.selectedColor; customAccentDialog.close(); } }
-        }
+        initialColor: root.customAccent
+        presetColors: ["#ff4444", "#ff8844", "#ffc94d", "#5bd06d", "#27d2bf", "#3a9fff", "#9b5de5", "#ff7aa8", "#222222", "#888888", "#bbbbbb", "#ffffff"]
+        onAccepted: root.customAccent = c
     }
 
-    Window {
+    ColorPickerDialog {
         id: customBgColorDialog
         title: tt("customBg")
-        modality: Qt.WindowModal
-        transientParent: appearanceDialog
-        width: 340; height: 540
-        minimumWidth: 320; minimumHeight: 520
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
-        x: root.x + (root.width - width) / 2
-        y: root.y + (root.height - height) / 2
-        palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
-        property color selectedColor: root.customBgColor
-        onVisibleChanged: if (visible) selectedColor = root.customBgColor
-        Flickable {
-            anchors.fill: parent; anchors.margins: 12; anchors.bottomMargin: 52
-            clip: true; contentWidth: width; contentHeight: bgColorCol.implicitHeight
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: MainSB {}
-            ColumnLayout {
-                id: bgColorCol; width: parent.width; spacing: 10
-                Rectangle { Layout.fillWidth: true; height: 40; radius: 8; color: customBgColorDialog.selectedColor; border.color: cBorder; border.width: 1 }
-                Loader {
-                    id: bgColorPickerLoader
-                    sourceComponent: hsvPickerComp
-                    Layout.fillWidth: true; Layout.preferredHeight: 180
-                    onLoaded: { item.selectedColor = customBgColorDialog.selectedColor }
-                }
-                Connections { target: bgColorPickerLoader.item; function onSelectedColorChanged() { customBgColorDialog.selectedColor = bgColorPickerLoader.item.selectedColor } }
-                Binding { target: bgColorPickerLoader.item; property: "selectedColor"; value: customBgColorDialog.selectedColor; when: bgColorPickerLoader.item && !bgColorPickerLoader.item.internalChange }
-                Label { text: tt("presetColors"); color: cSub; font.pixelSize: 12 }
-                Flow { Layout.fillWidth: true; spacing: 6
-                    Repeater {
-                        model: ["#ff4444", "#ff8844", "#ffc94d", "#5bd06d", "#27d2bf", "#3a9fff", "#9b5de5", "#ff7aa8", "#222222", "#888888", "#bbbbbb", "#ffffff"]
-                        delegate: Rectangle {
-                            width: 28; height: 28; radius: 5; color: modelData
-                            border.width: customBgColorDialog.selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? 3 : 1
-                            border.color: customBgColorDialog.selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? cAccent : cBorder
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: customBgColorDialog.selectedColor = modelData }
-                        }
-                    }
-                }
-                Label { text: tt("hexCode"); color: cSub; font.pixelSize: 12 }
-                TextField {
-                    id: bgColorHexInput; Layout.fillWidth: true
-                    text: customBgColorDialog.selectedColor.toString().toUpperCase()
-                    placeholderText: "#RRGGBB"
-                    background: InputBg {}
-                    onEditingFinished: { var t = text.trim(); if (/^#[0-9a-fA-F]{6}$/.test(t) || /^#[0-9a-fA-F]{8}$/.test(t)) customBgColorDialog.selectedColor = t; else text = customBgColorDialog.selectedColor.toString().toUpperCase(); }
-                }
-            }
-        }
-        Row {
-            anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
-            anchors.margins: 12; spacing: 8
-            Item { width: parent.width - 180; height: 1 }
-            BtnCancel { onClicked: customBgColorDialog.close() }
-            BtnOk { onClicked: { root.customBgColor = customBgColorDialog.selectedColor; customBgColorDialog.close(); } }
-        }
+        initialColor: root.customBgColor
+        presetColors: ["#ff4444", "#ff8844", "#ffc94d", "#5bd06d", "#27d2bf", "#3a9fff", "#9b5de5", "#ff7aa8", "#222222", "#888888", "#bbbbbb", "#ffffff"]
+        onAccepted: root.customBgColor = c
     }
 
-    // ===== 自定义主文本颜色选择窗口 =====
-    Window {
+    ColorPickerDialog {
         id: customTextColorDialog
         title: tt("mainTextColor")
-        modality: Qt.WindowModal
-        transientParent: appearanceDialog
-        width: 340; height: 540
-        minimumWidth: 320; minimumHeight: 520
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
-        x: root.x + (root.width - width) / 2
-        y: root.y + (root.height - height) / 2
-        palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
-        property color selectedColor: root.customTextColor
-        onVisibleChanged: if (visible) selectedColor = root.customTextColor
-        Flickable {
-            anchors.fill: parent; anchors.margins: 12; anchors.bottomMargin: 52
-            clip: true; contentWidth: width; contentHeight: textColorCol.implicitHeight
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: MainSB {}
-            ColumnLayout {
-                id: textColorCol; width: parent.width; spacing: 10
-                Rectangle { Layout.fillWidth: true; height: 40; radius: 8; color: customTextColorDialog.selectedColor; border.color: cBorder; border.width: 1
-                    Text { anchors.centerIn: parent; text: tt("aaBbText"); color: customTextColorDialog.selectedColor; font.pixelSize: 16
-                        style: Text.Outline; styleColor: Qt.rgba(1-customTextColorDialog.selectedColor.r, 1-customTextColorDialog.selectedColor.g, 1-customTextColorDialog.selectedColor.b, 0.3) }
-                }
-                Loader {
-                    id: textColorPickerLoader
-                    sourceComponent: hsvPickerComp
-                    Layout.fillWidth: true; Layout.preferredHeight: 180
-                    onLoaded: { item.selectedColor = customTextColorDialog.selectedColor }
-                }
-                Connections { target: textColorPickerLoader.item; function onSelectedColorChanged() { customTextColorDialog.selectedColor = textColorPickerLoader.item.selectedColor } }
-                Binding { target: textColorPickerLoader.item; property: "selectedColor"; value: customTextColorDialog.selectedColor; when: textColorPickerLoader.item && !textColorPickerLoader.item.internalChange }
-                Label { text: tt("presetColors"); color: cSub; font.pixelSize: 12 }
-                Flow { Layout.fillWidth: true; spacing: 6
-                    Repeater {
-                        model: ["#222222", "#444444", "#666666", "#1a3a5c", "#5c1a3a", "#3a5c1a", "#5c3a1a", "#e8e8ec", "#ffffff", "#ffd700", "#1a1a1a", "#888888"]
-                        delegate: Rectangle {
-                            width: 28; height: 28; radius: 5; color: modelData
-                            border.width: customTextColorDialog.selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? 3 : 1
-                            border.color: customTextColorDialog.selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? cAccent : cBorder
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: customTextColorDialog.selectedColor = modelData }
-                        }
-                    }
-                }
-                Label { text: tt("hexCode"); color: cSub; font.pixelSize: 12 }
-                TextField {
-                    id: textHexInput; Layout.fillWidth: true
-                    text: customTextColorDialog.selectedColor.toString().toUpperCase()
-                    placeholderText: "#RRGGBB"
-                    background: InputBg {}
-                    onEditingFinished: { var t = text.trim(); if (/^#[0-9a-fA-F]{6}$/.test(t) || /^#[0-9a-fA-F]{8}$/.test(t)) customTextColorDialog.selectedColor = t; else text = customTextColorDialog.selectedColor.toString().toUpperCase(); }
-                }
-            }
-        }
-        Row {
-            anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
-            anchors.margins: 12; spacing: 8
-            Item { width: parent.width - 180; height: 1 }
-            BtnCancel { onClicked: customTextColorDialog.close() }
-            BtnOk { onClicked: { root.customTextColor = customTextColorDialog.selectedColor; root.customTextColorSet = true; customTextColorDialog.close(); } }
-        }
+        initialColor: root.customTextColor
+        previewText: tt("aaBbText")
+        presetColors: ["#222222", "#444444", "#666666", "#1a3a5c", "#5c1a3a", "#3a5c1a", "#5c3a1a", "#e8e8ec", "#ffffff", "#ffd700", "#1a1a1a", "#888888"]
+        onAccepted: { root.customTextColor = c; root.customTextColorSet = true }
     }
 
-    // ===== 自定义次要文本颜色选择窗口 =====
-    Window {
+    ColorPickerDialog {
         id: customSubColorDialog
         title: tt("subTextColor")
-        modality: Qt.WindowModal
-        transientParent: appearanceDialog
-        width: 340; height: 540
-        minimumWidth: 320; minimumHeight: 520
-        color: root.cBg
-        flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowCloseButtonHint
-        x: root.x + (root.width - width) / 2
-        y: root.y + (root.height - height) / 2
-        palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
-        property color selectedColor: root.customSubColor
-        onVisibleChanged: if (visible) selectedColor = root.customSubColor
-        Flickable {
-            anchors.fill: parent; anchors.margins: 12; anchors.bottomMargin: 52
-            clip: true; contentWidth: width; contentHeight: subColorCol.implicitHeight
-            boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: MainSB {}
-            ColumnLayout {
-                id: subColorCol; width: parent.width; spacing: 10
-                Rectangle { Layout.fillWidth: true; height: 40; radius: 8; color: root.customBgColor; border.color: cBorder; border.width: 1
-                    Text { anchors.centerIn: parent; text: tt("aaBbDesc"); color: customSubColorDialog.selectedColor; font.pixelSize: 14 }
-                }
-                Loader {
-                    id: subColorPickerLoader
-                    sourceComponent: hsvPickerComp
-                    Layout.fillWidth: true; Layout.preferredHeight: 180
-                    onLoaded: { item.selectedColor = customSubColorDialog.selectedColor }
-                }
-                Connections { target: subColorPickerLoader.item; function onSelectedColorChanged() { customSubColorDialog.selectedColor = subColorPickerLoader.item.selectedColor } }
-                Binding { target: subColorPickerLoader.item; property: "selectedColor"; value: customSubColorDialog.selectedColor; when: subColorPickerLoader.item && !subColorPickerLoader.item.internalChange }
-                Label { text: tt("presetColors"); color: cSub; font.pixelSize: 12 }
-                Flow { Layout.fillWidth: true; spacing: 6
-                    Repeater {
-                        model: ["#666666", "#888888", "#9999aa", "#4a6a8a", "#8a4a6a", "#4a8a6a", "#8a6a4a", "#bbbbbb", "#cccccc", "#ff9966", "#aaaaaa", "#555555"]
-                        delegate: Rectangle {
-                            width: 28; height: 28; radius: 5; color: modelData
-                            border.width: customSubColorDialog.selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? 3 : 1
-                            border.color: customSubColorDialog.selectedColor.toString().toLowerCase() === modelData.toLowerCase() ? cAccent : cBorder
-                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: customSubColorDialog.selectedColor = modelData }
-                        }
-                    }
-                }
-                Label { text: tt("hexCode"); color: cSub; font.pixelSize: 12 }
-                TextField {
-                    id: subHexInput; Layout.fillWidth: true
-                    text: customSubColorDialog.selectedColor.toString().toUpperCase()
-                    placeholderText: "#RRGGBB"
-                    background: InputBg {}
-                    onEditingFinished: { var t = text.trim(); if (/^#[0-9a-fA-F]{6}$/.test(t) || /^#[0-9a-fA-F]{8}$/.test(t)) customSubColorDialog.selectedColor = t; else text = customSubColorDialog.selectedColor.toString().toUpperCase(); }
-                }
-            }
-        }
-        Row {
-            anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
-            anchors.margins: 12; spacing: 8
-            Item { width: parent.width - 180; height: 1 }
-            BtnCancel { onClicked: customSubColorDialog.close() }
-            BtnOk { onClicked: { root.customSubColor = customSubColorDialog.selectedColor; root.customSubColorSet = true; customSubColorDialog.close(); } }
-        }
+        initialColor: root.customSubColor
+        previewText: tt("aaBbDesc")
+        previewBgColor: root.customBgColor
+        previewFontSize: 14
+        previewOutline: false
+        presetColors: ["#666666", "#888888", "#9999aa", "#4a6a8a", "#8a4a6a", "#4a8a6a", "#8a6a4a", "#bbbbbb", "#cccccc", "#ff9966", "#aaaaaa", "#555555"]
+        onAccepted: { root.customSubColor = c; root.customSubColorSet = true }
     }
 }

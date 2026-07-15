@@ -333,17 +333,13 @@ bool DatabaseManager::moveScreenshot(int id, int direction)
     int gameId = cur.value(0).toInt();
     int curOrder = cur.value(1).toInt();
 
-    // 查找相邻记录（按 sort_order 排序）
+    // 查找相邻记录（上移取 < 当前且 DESC，下移取 > 当前且 ASC）
+    const bool up = direction < 0;
     QSqlQuery neighbor;
-    if (direction == -1) {
-        neighbor.prepare(QStringLiteral(
-            "SELECT id, sort_order FROM screenshots WHERE game_id = :gid AND sort_order < :cur "
-            "ORDER BY sort_order DESC LIMIT 1"));
-    } else {
-        neighbor.prepare(QStringLiteral(
-            "SELECT id, sort_order FROM screenshots WHERE game_id = :gid AND sort_order > :cur "
-            "ORDER BY sort_order ASC LIMIT 1"));
-    }
+    neighbor.prepare(QStringLiteral(
+        "SELECT id, sort_order FROM screenshots WHERE game_id = :gid AND sort_order %1 :cur "
+        "ORDER BY sort_order %2 LIMIT 1").arg(up ? QStringLiteral("<") : QStringLiteral(">"),
+                                              up ? QStringLiteral("DESC") : QStringLiteral("ASC")));
     neighbor.bindValue(":gid", gameId);
     neighbor.bindValue(":cur", curOrder);
     if (!neighbor.exec() || !neighbor.next()) {
@@ -437,22 +433,21 @@ QVariantMap DatabaseManager::getScreenshotSettings(int gameId)
     settings["fade"] = 800;
 
     // 从 app_settings 读取，key 格式：ss_interval_<gameId> / ss_fade_<gameId>
-    QSqlQuery q1;
-    q1.prepare(QStringLiteral("SELECT value FROM app_settings WHERE key = :k"));
-    q1.bindValue(":k", QStringLiteral("ss_interval_%1").arg(gameId));
-    if (q1.exec() && q1.next()) {
-        bool ok = false;
-        int v = q1.value(0).toInt(&ok);
-        if (ok && v > 0) settings["interval"] = v;
-    }
-    QSqlQuery q2;
-    q2.prepare(QStringLiteral("SELECT value FROM app_settings WHERE key = :k"));
-    q2.bindValue(":k", QStringLiteral("ss_fade_%1").arg(gameId));
-    if (q2.exec() && q2.next()) {
-        bool ok = false;
-        int v = q2.value(0).toInt(&ok);
-        if (ok && v >= 0) settings["fade"] = v;
-    }
+    auto readInt = [gameId](const QString &suffix, int minVal) -> int {
+        QSqlQuery q;
+        q.prepare(QStringLiteral("SELECT value FROM app_settings WHERE key = :k"));
+        q.bindValue(":k", QStringLiteral("ss_%1_%2").arg(suffix).arg(gameId));
+        if (q.exec() && q.next()) {
+            bool ok = false;
+            const int v = q.value(0).toInt(&ok);
+            if (ok && v >= minVal) return v;
+        }
+        return -1;
+    };
+    const int interval = readInt("interval", 1);
+    if (interval >= 0) settings["interval"] = interval;
+    const int fade = readInt("fade", 0);
+    if (fade >= 0) settings["fade"] = fade;
     return settings;
 }
 
@@ -796,14 +791,8 @@ bool DatabaseManager::addGame(const QString &name, const QStringList &types,
         "VALUES (:name, :types, :rating, :status, :play_time, :start_date, :finish_date, :notes, :cover_path)"
     ));
 
-    QJsonArray typeArray;
-    for (const QString &t : types)
-        typeArray.append(t);
-    const QString typesJson = QString::fromUtf8(
-        QJsonDocument(typeArray).toJson(QJsonDocument::Compact));
-
     query.bindValue(":name", name);
-    query.bindValue(":types", typesJson);
+    query.bindValue(":types", typesToJson(types));
     query.bindValue(":rating", rating);
     query.bindValue(":status", status);
     query.bindValue(":play_time", playTime);
@@ -844,15 +833,13 @@ bool DatabaseManager::deleteGame(int id)
         gameDir.removeRecursively();
     }
 
-    // 删除该游戏的回忆播放参数
-    QSqlQuery setDel1;
-    setDel1.prepare(QStringLiteral("DELETE FROM app_settings WHERE key = :k"));
-    setDel1.bindValue(":k", QStringLiteral("ss_interval_%1").arg(id));
-    setDel1.exec();
-    QSqlQuery setDel2;
-    setDel2.prepare(QStringLiteral("DELETE FROM app_settings WHERE key = :k"));
-    setDel2.bindValue(":k", QStringLiteral("ss_fade_%1").arg(id));
-    setDel2.exec();
+    // 删除该游戏的回忆播放参数（ss_interval_<id> / ss_fade_<id>）
+    QSqlQuery setDel;
+    setDel.prepare(QStringLiteral(
+        "DELETE FROM app_settings WHERE key = :k1 OR key = :k2"));
+    setDel.bindValue(":k1", QStringLiteral("ss_interval_%1").arg(id));
+    setDel.bindValue(":k2", QStringLiteral("ss_fade_%1").arg(id));
+    setDel.exec();
 
     // 删除该游戏的封面文件（仅限 data/covers/ 内的文件，避免误删用户外部图片）
     QSqlQuery coverQuery;
@@ -899,14 +886,8 @@ bool DatabaseManager::updateGame(int id, const QString &name, const QStringList 
         "finish_date = :finish_date, notes = :notes, cover_path = :cover_path WHERE id = :id"
     ));
 
-    QJsonArray typeArray;
-    for (const QString &t : types)
-        typeArray.append(t);
-    const QString typesJson = QString::fromUtf8(
-        QJsonDocument(typeArray).toJson(QJsonDocument::Compact));
-
     query.bindValue(":name", name);
-    query.bindValue(":types", typesJson);
+    query.bindValue(":types", typesToJson(types));
     query.bindValue(":rating", rating);
     query.bindValue(":status", status);
     query.bindValue(":play_time", playTime);
@@ -1091,6 +1072,14 @@ QString DatabaseManager::csvCell(const QString &s)
     if (s.contains(',') || s.contains('"') || s.contains('\n'))
         return "\"" + QString(s).replace("\"", "\"\"") + "\"";
     return s;
+}
+
+QString DatabaseManager::typesToJson(const QStringList &types)
+{
+    QJsonArray arr;
+    for (const QString &t : types)
+        arr.append(t);
+    return QString::fromUtf8(QJsonDocument(arr).toJson(QJsonDocument::Compact));
 }
 
 bool DatabaseManager::importData(const QString &filePath)

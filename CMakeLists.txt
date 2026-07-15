@@ -1,4 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
+
+# 修复 MinGW 编译器无法创建临时文件的问题
+# （Qt Creator 进程环境中 TMP/TEMP 可能丢失，导致 g++.exe 回退到 C:\Windows\ 无写权限）
+# 必须在 project() 之前设置，因为 project() 会触发编译器检测（try_compile）
+if(NOT DEFINED ENV{TMP} AND NOT DEFINED ENV{TEMP})
+    set(ENV{TMP} "C:/Temp")
+    set(ENV{TEMP} "C:/Temp")
+endif()
+
 project(galgame VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)

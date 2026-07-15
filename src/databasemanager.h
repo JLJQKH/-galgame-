@@ -84,6 +84,7 @@ private:
     bool createScreenshotsTable();
     bool createSettingsTable();
     static QString csvCell(const QString &s);   // CSV 字段转义
+    static QString typesToJson(const QStringList &types);  // QStringList → JSON 数组字符串
     bool resetIds();   // 删除后重排所有 id 连续（1,2,3...）
     void cleanupCropsDir();   // 清理 data/crops/ 中不被 bg_images 引用的冗余裁剪文件
 };
