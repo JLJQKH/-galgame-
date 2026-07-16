@@ -10,6 +10,12 @@ endif()
 
 project(galgame VERSION 0.1.0 LANGUAGES CXX)
 
+# 默认构建类型为 Debug（避免 Qt Creator "No Debug CMake configuration found" 错误）
+# 仅在未设置单配置构建类型且非多配置生成器时生效
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
@@ -48,6 +54,7 @@ target_link_libraries(galgame PRIVATE
     Qt6::Charts
     Qt6::Sql
     Qt6::Widgets
+    Qt6::Multimedia
 )
 
 set_target_properties(galgame PROPERTIES

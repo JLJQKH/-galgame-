@@ -14,13 +14,55 @@ Window {
     minimumWidth: 720; minimumHeight: 405
     visible: true; title: "🎮 " + tt("appTitle"); color: cBg
     flags: Qt.FramelessWindowHint | Qt.Window  // 无边框窗口（C++ 侧处理边缘缩放）
-    // 主背景容器：纯色背景填充
+    // 主背景容器：纯色背景填充 + 所有背景图层统一在此内部声明（方案B 统一 bgRect 内部结构）
     Rectangle {
         id: bgRect; anchors.fill: parent; color: cBg
+
+        // ===== 背景图层（视频）— Qt 6 官方示例结构：VideoOutput 直接在父 Rectangle 内部声明 =====
+        VideoOutput {
+            id: bgVideo
+            anchors.fill: parent
+            visible: root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)
+            fillMode: VideoOutput.PreserveAspectCrop
+        }
+
+        // ===== 背景图层（静态图片）— 分层结构：外层 Item 管 opacity，内层 Image 管 layer.blur =====
+        // 解决 opacity + layer.effect 在同一 Item 上冲突导致图片消失的问题（Qt 6 layer 纹理合成顺序问题）
+        // layer.enabled 恒等于 visible 避免模糊值变化时 FBO 销毁重建导致闪烁
+        // MultiEffect.blurEnabled 控制 blur=0 时禁用模糊运算但保持 layer 纹理不销毁
+        Item {
+            id: bgImageWrap
+            anchors.fill: parent
+            opacity: root.bgOpacity
+            visible: root.bgImagePath.length > 0 && !root.bgImagePath.toLowerCase().endsWith(".gif") && !isVideoFile(root.bgImagePath)
+            Image {
+                id: bgImage; anchors.fill: parent
+                source: root.bgImagePath.length > 0 ? "file:///" + root.bgImagePath.replace(/\\/g, "/") : ""
+                fillMode: Image.PreserveAspectCrop
+                layer.enabled: bgImageWrap.visible
+                layer.effect: MultiEffect { blurEnabled: root.bgBlur > 0; blur: root.bgBlur; blurMax: 64 }
+            }
+        }
+
+        // ===== 背景图层（GIF 动画）— 同样分层结构 =====
+        Item {
+            id: bgGifWrap
+            anchors.fill: parent
+            opacity: root.bgOpacity
+            visible: root.bgImagePath.length > 0 && root.bgImagePath.toLowerCase().endsWith(".gif")
+            AnimatedImage {
+                id: bgGif; anchors.fill: parent
+                source: root.bgImagePath.toLowerCase().endsWith(".gif") ? "file:///" + root.bgImagePath.replace(/\\/g, "/") : ""
+                fillMode: Image.PreserveAspectCrop
+                layer.enabled: bgGifWrap.visible
+                layer.effect: MultiEffect { blurEnabled: root.bgBlur > 0; blur: root.bgBlur; blurMax: 64 }
+            }
+        }
     }
     id: root
     property bool isDark: false
     property string lastTheme: "blue"   // 进入黑夜模式前的主题，退出时恢复
+    property string preCustomTheme: "blue"   // 进入自定义模式前的系统主题，退出自定义时恢复
     property int totalCount: 0; property int todoCount: 0
     property int playingCount: 0; property int doneCount: 0
     property string statusFilter: ""
@@ -389,6 +431,7 @@ Window {
         v = dbManager.getSetting("theme"); if (v.length > 0) root.currentTheme = v;
         v = dbManager.getSetting("isDark"); if (v.length > 0) root.isDark = (v === "1");
         v = dbManager.getSetting("lastTheme"); if (v.length > 0) root.lastTheme = v;
+        v = dbManager.getSetting("preCustomTheme"); if (v.length > 0) root.preCustomTheme = v;
         v = dbManager.getSetting("clockVisible"); if (v.length > 0) root.clockVisible = (v === "1");
         v = dbManager.getSetting("customAccent"); if (v.length > 0) root.customAccent = v;
         v = dbManager.getSetting("customBgColor"); if (v.length > 0) root.customBgColor = v;
@@ -397,6 +440,8 @@ Window {
         v = dbManager.getSetting("customTextColorSet"); if (v.length > 0) root.customTextColorSet = (v === "1");
         v = dbManager.getSetting("customSubColorSet"); if (v.length > 0) root.customSubColorSet = (v === "1");
         v = dbManager.getSetting("bgImagePath"); if (v.length > 0) root.bgImagePath = v;
+        // 启动时延迟查询 currentBgHistoryId（避免阻塞启动加载）
+        if (v.length > 0) bgHistoryIdTimer.start()
         v = dbManager.getSetting("bgOpacity"); if (v.length > 0) root.bgOpacity = parseFloat(v);
         v = dbManager.getSetting("bgBlur"); if (v.length > 0) root.bgBlur = parseFloat(v);
         v = dbManager.getSetting("bgVideoMuted"); if (v.length > 0) root.bgVideoMuted = (v === "1");
@@ -408,6 +453,20 @@ Window {
         loadAppearance();
         reloadList(); refreshStats(); refreshMainPie();
     }
+    // 启动时延迟查询 currentBgHistoryId（避免在 loadAppearance 中同步查询阻塞）
+    Timer {
+        id: bgHistoryIdTimer
+        interval: 50; repeat: false
+        onTriggered: {
+            var foundId = -1
+            var normPath = root.bgImagePath.replace(/\\/g, "/")
+            var imgs = dbManager.getBgImages()
+            for (var i = 0; i < imgs.length; i++) {
+                if (imgs[i].imagePath.replace(/\\/g, "/") === normPath) { foundId = imgs[i].id; break }
+            }
+            root.currentBgHistoryId = foundId
+        }
+    }
 
     // 属性变化时自动持久化到数据库
     onCurrentLangChanged: {
@@ -418,6 +477,7 @@ Window {
     onCurrentThemeChanged: dbManager.setSetting("theme", root.currentTheme)
     onIsDarkChanged: dbManager.setSetting("isDark", root.isDark ? "1" : "0")
     onLastThemeChanged: dbManager.setSetting("lastTheme", root.lastTheme)
+    onPreCustomThemeChanged: dbManager.setSetting("preCustomTheme", root.preCustomTheme)
     onClockVisibleChanged: dbManager.setSetting("clockVisible", root.clockVisible ? "1" : "0")
     onCustomAccentChanged: dbManager.setSetting("customAccent", root.customAccent.toString())
     onCustomBgColorChanged: dbManager.setSetting("customBgColor", root.customBgColor.toString())
@@ -427,13 +487,8 @@ Window {
     onCustomSubColorSetChanged: dbManager.setSetting("customSubColorSet", root.customSubColorSet ? "1" : "0")
     onBgImagePathChanged: {
         dbManager.setSetting("bgImagePath", root.bgImagePath)
-        // 路径变化时，查找该路径是否对应历史记录，更新 currentBgHistoryId
-        var foundId = -1
-        var imgs = dbManager.getBgImages()
-        for (var i = 0; i < imgs.length; i++) {
-            if (imgs[i].imagePath === root.bgImagePath) { foundId = imgs[i].id; break }
-        }
-        root.currentBgHistoryId = foundId
+        // currentBgHistoryId 由各设置 bgImagePath 的位置直接设置（避免同步数据库查询阻塞 QML 绑定更新）
+        // 清除背景时设为 -1，历史背景点击时设为 modelData.id，其他位置设为 -1
     }
     onBgOpacityChanged: {
         dbManager.setSetting("bgOpacity", root.bgOpacity.toString())
@@ -640,8 +695,8 @@ Window {
 
     // 主操作按钮（accent 背景 + 白字），BtnOk/BtnSave/BtnImport 仅为预设默认文案的别名
     component BtnPrimary: Button {
-        highlighted: true
-        background: Rectangle { color: cAccent; radius: 4; implicitWidth: 72; implicitHeight: 32 }
+        id: bpBtn; highlighted: true
+        background: Rectangle { color: bpBtn.hovered ? Qt.darker(cAccent, 1.2) : cAccent; radius: 4; implicitWidth: 72; implicitHeight: 32; Behavior on color { ColorAnimation { duration: 150 } } }
         palette.buttonText: "#ffffff"
     }
     component BtnOk: BtnPrimary { text: "OK" }
@@ -649,14 +704,15 @@ Window {
     component BtnImport: BtnPrimary { text: "Import" }
 
     component BtnCancel: Button {
-        text: "Cancel"; flat: true
-        background: Rectangle { color: "#30ff4444"; radius: 4; border.color: "#ff4444"; border.width: 1; implicitWidth: 72; implicitHeight: 32 }
-        palette.buttonText: "#ff4444"
+        id: bcBtn; text: "Cancel"; flat: true
+        background: Rectangle { color: bcBtn.hovered ? "#ff4444" : "#30ff4444"; radius: 4; border.color: "#ff4444"; border.width: 1; implicitWidth: 72; implicitHeight: 32; Behavior on color { ColorAnimation { duration: 150 } } }
+        palette.buttonText: bcBtn.hovered ? "#ffffff" : "#ff4444"
     }
 
     component BtnClose: Button {
-        text: "Close"; flat: true
-        background: Rectangle { color: "transparent"; radius: 4; border.color: cBorder; border.width: 1; implicitWidth: 72; implicitHeight: 32 }
+        id: bclBtn; text: "Close"; flat: true
+        background: Rectangle { color: bclBtn.hovered ? "#ff4444" : "transparent"; radius: 4; border.color: bclBtn.hovered ? "#ff4444" : cBorder; border.width: 1; implicitWidth: 72; implicitHeight: 32; Behavior on color { ColorAnimation { duration: 150 } } }
+        palette.buttonText: bclBtn.hovered ? "#ffffff" : cText
     }
 
     // 对话框底部按钮栏（居中）
@@ -672,9 +728,9 @@ Window {
 
     // 圆角半透明按钮
     component BtnGhost: Button {
-        flat: true
-        background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.15); radius: 8; border.color: cAccent; border.width: 1; implicitWidth: 100; implicitHeight: 34 }
-        palette.buttonText: cAccent
+        id: bgBtn; flat: true
+        background: Rectangle { color: bgBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.15); radius: 8; border.color: cAccent; border.width: 1; implicitWidth: 100; implicitHeight: 34; Behavior on color { ColorAnimation { duration: 150 } } }
+        palette.buttonText: bgBtn.hovered ? "#ffffff" : cAccent
     }
 
     // 与主页面一致的自动隐藏滚动条
@@ -812,48 +868,15 @@ Window {
         }
     }
 
-    // ===== 背景图层（静态）— 分层结构：外层 Item 管 opacity，内层 Image 管 layer.blur
-    // 解决 opacity + layer.effect 在同一 Item 上冲突导致图片消失的问题（Qt 6 layer 纹理合成顺序问题）
-    // layer.enabled 恒等于 visible 避免模糊值变化时 FBO 销毁重建导致闪烁
-    Item {
-        id: bgImageWrap; parent: bgRect; anchors.fill: parent; z: -1
-        opacity: root.bgOpacity
-        visible: root.bgImagePath.length > 0 && !root.bgImagePath.toLowerCase().endsWith(".gif") && !isVideoFile(root.bgImagePath)
-        Image {
-            id: bgImage; anchors.fill: parent
-            source: bgImageWrap.visible ? "file:///" + root.bgImagePath : ""
-            fillMode: Image.PreserveAspectCrop
-            layer.enabled: bgImageWrap.visible   // 恒启用（visible 时），避免 blur=0 临界点切换 FBO 闪烁
-            layer.effect: MultiEffect { blurEnabled: root.bgBlur > 0; blur: root.bgBlur; blurMax: 64 }
-        }
-    }
-    // ===== 背景图层（GIF 动画）— 同样分层结构 =====
-    Item {
-        id: bgGifWrap; parent: bgRect; anchors.fill: parent; z: -1
-        opacity: root.bgOpacity
-        visible: root.bgImagePath.length > 0 && root.bgImagePath.toLowerCase().endsWith(".gif")
-        AnimatedImage {
-            id: bgGif; anchors.fill: parent
-            source: bgGifWrap.visible ? "file:///" + root.bgImagePath : ""
-            fillMode: Image.PreserveAspectCrop
-            layer.enabled: bgGifWrap.visible
-            layer.effect: MultiEffect { blurEnabled: root.bgBlur > 0; blur: root.bgBlur; blurMax: 64 }
-        }
-    }
-    // ===== 背景图层（视频）=====
-    VideoOutput {
-        id: bgVideo; parent: bgRect; anchors.fill: parent; z: -1
-        visible: root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)
-        fillMode: VideoOutput.PreserveAspectCrop   // 与图片保持一致的应用模式
-        // 视频背景不使用透明度/模糊度（外观对话框在视频模式下已隐藏这两个滑块）
-    }
+    // ===== 背景图层（视频）— MediaPlayer + Connections =====
+    // VideoOutput 已在 bgRect 内部声明（L22-27），MediaPlayer 通过 videoOutput:bgVideo 反向绑定
     MediaPlayer {
         id: bgMediaPlayer
-        source: root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath) ? "file:///" + root.bgImagePath : ""
+        source: root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath) ? "file:///" + root.bgImagePath.replace(/\\/g, "/") : ""
         loops: MediaPlayer.Infinite   // 循环播放
         videoOutput: bgVideo
-        audioOutput: AudioOutput { id: bgAudioOutput; volume: root.bgVideoMuted ? 0.0 : root.bgVideoVolume }   // 静音/声音模式+音量控制
-        // 视频文件且窗口可见时播放，否则暂停
+        audioOutput: AudioOutput { id: bgAudioOutput; volume: root.bgVideoMuted ? 0.0 : root.bgVideoVolume }
+        // 视频文件且窗口可见时播放，否则停止
         onSourceChanged: {
             if (root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath) && root.visible) play()
             else stop()
@@ -891,11 +914,11 @@ Window {
             anchors.right: parent.right; anchors.rightMargin: 8; anchors.verticalCenter: parent.verticalCenter; spacing: 4
             // 语言切换（地球图标 + Menu 下拉）
             Button {
-                text: "🌍"; flat: true
+                id: langBtn; text: "🌍"; flat: true
                 layer.enabled: true
                 layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
-                background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36 }
-                palette.buttonText: cAccent
+                background: Rectangle { color: langBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: langBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
+                palette.buttonText: langBtn.hovered ? "#ffffff" : cAccent
                 onClicked: langMenu.open()
                 Menu {
                     id: langMenu
@@ -908,11 +931,11 @@ Window {
             }
             // 夜晚模式切换（月亮=夜晚激活 / 太阳=白天）
             Button {
-                text: root.isDark ? "🌙" : "☀️"; flat: true
+                id: darkBtn; text: root.isDark ? "🌙" : "☀️"; flat: true
                 layer.enabled: true
                 layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
-                background: Rectangle { color: root.isDark ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.3) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36 }
-                palette.buttonText: cAccent
+                background: Rectangle { color: darkBtn.hovered ? cAccent : (root.isDark ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.3) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12)); radius: 8; border.color: darkBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
+                palette.buttonText: darkBtn.hovered ? "#ffffff" : cAccent
                 onClicked: {
                     if (!root.isDark) {
                         // 进入黑夜模式：记录当前主题，custom 主题切到 blue（custom 背景色与暗色不兼容）
@@ -927,18 +950,19 @@ Window {
                 }
             }
             Button {
-                text: "🕐"; flat: true
+                id: clockBtn; text: "🕐"; flat: true
                 layer.enabled: true
                 layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
-                background: Rectangle { color: clockVisible ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.3) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36 }
-                palette.buttonText: cAccent
+                background: Rectangle { color: clockBtn.hovered ? cAccent : (clockVisible ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.3) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12)); radius: 8; border.color: clockBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
+                palette.buttonText: clockBtn.hovered ? "#ffffff" : cAccent
                 onClicked: clockVisible = !clockVisible
             }
             Button {
-                text: "⚙️"; flat: true
+                id: settingsBtn; text: "⚙️"; flat: true
                 layer.enabled: true
                 layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
-                background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36 }
+                background: Rectangle { color: settingsBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: settingsBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
+                palette.buttonText: settingsBtn.hovered ? "#ffffff" : cAccent
                 onClicked: settingsDialog.show()
             }
             // 窗口控制按钮（最小化/最大化/关闭）
@@ -1181,26 +1205,30 @@ Window {
         onContentYChanged: { mainScrollSB.opacity = 1.0; sbHideTimer.restart() }
     }   // Flickable
 
-    // ===== 视频背景声音模块（仅视频背景时显示，固定在主页面底部）=====
+    // ===== 视频背景声音模块（仅视频背景时显示，固定在主页面右下角，透明背景无边框）=====
     Rectangle {
         id: videoSoundBar
         parent: bgRect
-        anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
-        height: 44
+        anchors.right: parent.right; anchors.bottom: parent.bottom
+        anchors.margins: 12
+        height: 44; width: soundRow.implicitWidth + 24
         visible: root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)
-        color: Qt.rgba(cCard.r, cCard.g, cCard.b, 0.92); border.color: cBorder; border.width: 1
-        Rectangle { anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; height: 2; color: cAccent; radius: 1 }
+        color: "transparent"; border.width: 0
+        radius: 8
         Row {
+            id: soundRow
             anchors.centerIn: parent; spacing: 12
             // 静音/声音切换按钮
             Button {
+                id: videoMuteBtn
                 text: root.bgVideoMuted ? "🔇 " + tt("videoMuted") : "🔊 " + tt("videoSound")
                 flat: true
                 background: Rectangle {
-                    color: root.bgVideoMuted ? Qt.rgba(cSub.r, cSub.g, cSub.b, 0.18) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.18)
-                    radius: 8; border.color: root.bgVideoMuted ? cSub : cAccent; border.width: 1; implicitHeight: 30
+                    color: videoMuteBtn.hovered ? cAccent : (root.bgVideoMuted ? Qt.rgba(cSub.r, cSub.g, cSub.b, 0.18) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.18))
+                    radius: 8; border.color: videoMuteBtn.hovered ? cAccent : (root.bgVideoMuted ? cSub : cAccent); border.width: 1; implicitHeight: 30
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
-                palette.buttonText: root.bgVideoMuted ? cSub : cAccent
+                palette.buttonText: videoMuteBtn.hovered ? "#ffffff" : (root.bgVideoMuted ? cSub : cAccent)
                 onClicked: root.bgVideoMuted = !root.bgVideoMuted
             }
             // 音量标签
@@ -1215,8 +1243,6 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
-        Behavior on height { NumberAnimation { duration: 200 } }
-        Behavior on opacity { NumberAnimation { duration: 200 } }
     }
 
     // ===== 添加游戏弹窗 =====
@@ -1799,16 +1825,16 @@ Window {
                                 BtnGhost { text: root.tt("editMemories"); implicitHeight: 28; implicitWidth: 80; enabled: gameDetailDialog.screenshots.length > 0 || dbManager.getMemoryRoot().length > 0; onClicked: { memoriesEditDialog.openWith(gameDetailDialog.detailGameId) }
                                     anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter }
                                 Button {
-                                    text: root.tt("gridMode"); flat: true; implicitHeight: 24; implicitWidth: 56
-                                    background: Rectangle { color: gameDetailDialog.memDisplayMode === "grid" ? Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.45) : Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.12); radius: 4; border.color: root.cBorder; border.width: 1 }
-                                    palette.buttonText: root.cAccent; font.pixelSize: 10
+                                    id: gridModeBtn; text: root.tt("gridMode"); flat: true; implicitHeight: 24; implicitWidth: 56
+                                    background: Rectangle { color: gridModeBtn.hovered ? root.cAccent : (gameDetailDialog.memDisplayMode === "grid" ? Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.45) : Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.12)); radius: 4; border.color: root.cBorder; border.width: 1; Behavior on color { ColorAnimation { duration: 150 } } }
+                                    palette.buttonText: gridModeBtn.hovered ? "#ffffff" : root.cAccent; font.pixelSize: 10
                                     onClicked: gameDetailDialog.memDisplayMode = "grid"
                                     anchors.right: parent.right; anchors.rightMargin: 88; anchors.verticalCenter: parent.verticalCenter
                                 }
                                 Button {
-                                    text: root.tt("carouselMode"); flat: true; implicitHeight: 24; implicitWidth: 56
-                                    background: Rectangle { color: gameDetailDialog.memDisplayMode === "carousel" ? Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.45) : Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.12); radius: 4; border.color: root.cBorder; border.width: 1 }
-                                    palette.buttonText: root.cAccent; font.pixelSize: 10
+                                    id: carouselModeBtn; text: root.tt("carouselMode"); flat: true; implicitHeight: 24; implicitWidth: 56
+                                    background: Rectangle { color: carouselModeBtn.hovered ? root.cAccent : (gameDetailDialog.memDisplayMode === "carousel" ? Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.45) : Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.12)); radius: 4; border.color: root.cBorder; border.width: 1; Behavior on color { ColorAnimation { duration: 150 } } }
+                                    palette.buttonText: carouselModeBtn.hovered ? "#ffffff" : root.cAccent; font.pixelSize: 10
                                     onClicked: gameDetailDialog.memDisplayMode = "carousel"
                                     anchors.right: parent.right; anchors.rightMargin: 88 + 60; anchors.verticalCenter: parent.verticalCenter
                                 }
@@ -1942,15 +1968,15 @@ Window {
                                 Row {
                                     spacing: 8
                                     Button {
-                                        text: root.tt("saveNotes"); flat: true; implicitHeight: 28; implicitWidth: 70
-                                        background: Rectangle { color: root.cAccent; radius: 4 }
+                                        id: saveNotesBtn; text: root.tt("saveNotes"); flat: true; implicitHeight: 28; implicitWidth: 70
+                                        background: Rectangle { color: saveNotesBtn.hovered ? root.cAccent : Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.85); radius: 4; Behavior on color { ColorAnimation { duration: 150 } } }
                                         palette.buttonText: "#ffffff"; font.pixelSize: 11
                                         onClicked: gameDetailDialog.saveInlineNotes(notesEditArea.text)
                                     }
                                     Button {
-                                        text: root.tt("cancelEdit"); flat: true; implicitHeight: 28; implicitWidth: 70
-                                        background: Rectangle { color: Qt.rgba(root.cText.r, root.cText.g, root.cText.b, 0.1); radius: 4; border.color: root.cBorder; border.width: 1 }
-                                        palette.buttonText: root.cSub; font.pixelSize: 11
+                                        id: cancelNotesBtn; text: root.tt("cancelEdit"); flat: true; implicitHeight: 28; implicitWidth: 70
+                                        background: Rectangle { color: cancelNotesBtn.hovered ? "#ff4444" : Qt.rgba(root.cText.r, root.cText.g, root.cText.b, 0.1); radius: 4; border.color: cancelNotesBtn.hovered ? "#ff4444" : root.cBorder; border.width: 1; Behavior on color { ColorAnimation { duration: 150 } } }
+                                        palette.buttonText: cancelNotesBtn.hovered ? "#ffffff" : root.cSub; font.pixelSize: 11
                                         onClicked: gameDetailDialog.editingNotes = false
                                     }
                                 }
@@ -1963,9 +1989,9 @@ Window {
                         width: parent.width; spacing: 8
                         Item { width: parent.width - 90; height: 1 }
                         Button {
-                            text: root.tt("del"); flat: true
-                            background: Rectangle { color: "#30ff4444"; radius: 6; border.color: "#ff4444"; border.width: 1; implicitHeight: 32; implicitWidth: 80 }
-                            palette.buttonText: "#ff4444"
+                            id: detailDelBtn; text: root.tt("del"); flat: true
+                            background: Rectangle { color: detailDelBtn.hovered ? "#ff4444" : "#30ff4444"; radius: 6; border.color: "#ff4444"; border.width: 1; implicitHeight: 32; implicitWidth: 80; Behavior on color { ColorAnimation { duration: 150 } } }
+                            palette.buttonText: detailDelBtn.hovered ? "#ffffff" : "#ff4444"
                             onClicked: { deleteDialog.openWith(gameDetailDialog.detailGameId, gameDetailDialog.detailGameName) }
                         }
                     }
@@ -2074,10 +2100,10 @@ Window {
 
                         // 添加回忆按钮（顶部）
                         Button {
-                            text: "+ " + tt("addScreenshot"); flat: true
+                            id: addMemBtn; text: "+ " + tt("addScreenshot"); flat: true
                             width: parent.width; implicitHeight: 32
-                            background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.2); radius: 6; border.color: cAccent; border.width: 1 }
-                            palette.buttonText: cAccent; font.pixelSize: 12
+                            background: Rectangle { color: addMemBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.2); radius: 6; border.color: cAccent; border.width: 1; Behavior on color { ColorAnimation { duration: 150 } } }
+                            palette.buttonText: addMemBtn.hovered ? "#ffffff" : cAccent; font.pixelSize: 12
                             onClicked: screenshotDialogForEdit.open()
                         }
 
@@ -2206,11 +2232,11 @@ Window {
 
                         // 删除当前选中回忆按钮（底部）
                         Button {
-                            text: "🗑 " + tt("deleteMemory"); flat: true
+                            id: delMemBtn; text: "🗑 " + tt("deleteMemory"); flat: true
                             width: parent.width; implicitHeight: 32
                             enabled: memoriesEditDialog.currentIdx >= 0
-                            background: Rectangle { color: enabled ? "#30ff4444" : Qt.rgba(cText.r, cText.g, cText.b, 0.05); radius: 6; border.color: enabled ? "#ff4444" : cBorder; border.width: 1 }
-                            palette.buttonText: enabled ? "#ff4444" : cSub; font.pixelSize: 12
+                            background: Rectangle { color: enabled ? (delMemBtn.hovered ? "#ff4444" : "#30ff4444") : Qt.rgba(cText.r, cText.g, cText.b, 0.05); radius: 6; border.color: enabled ? "#ff4444" : cBorder; border.width: 1; Behavior on color { ColorAnimation { duration: 150 } } }
+                            palette.buttonText: enabled ? (delMemBtn.hovered ? "#ffffff" : "#ff4444") : cSub; font.pixelSize: 12
                             onClicked: {
                                 if (memoriesEditDialog.currentIdx < 0) return;
                                 var item = memoriesEditDialog.screenshots[memoriesEditDialog.currentIdx];
@@ -2330,15 +2356,15 @@ Window {
                             Row {
                                 Layout.fillWidth: true; spacing: 8; layoutDirection: Qt.RightToLeft
                                 Button {
-                                    text: tt("resetAll"); flat: true; implicitHeight: 26; implicitWidth: 80; enabled: memoriesEditDialog.currentIdx >= 0
-                                    background: Rectangle { color: "#30ff4444"; radius: 4; border.color: "#ff4444"; border.width: 1 }
-                                    palette.buttonText: "#ff4444"; font.pixelSize: 10
+                                    id: resetAllBtn; text: tt("resetAll"); flat: true; implicitHeight: 26; implicitWidth: 80; enabled: memoriesEditDialog.currentIdx >= 0
+                                    background: Rectangle { color: enabled ? (resetAllBtn.hovered ? "#ff4444" : "#30ff4444") : Qt.rgba(cText.r, cText.g, cText.b, 0.05); radius: 4; border.color: enabled ? "#ff4444" : cBorder; border.width: 1; Behavior on color { ColorAnimation { duration: 150 } } }
+                                    palette.buttonText: enabled ? (resetAllBtn.hovered ? "#ffffff" : "#ff4444") : cSub; font.pixelSize: 10
                                     onClicked: memoriesEditDialog.resetCurrent()
                                 }
                                 Button {
-                                    text: tt("resetPosition"); flat: true; implicitHeight: 26; implicitWidth: 90; enabled: memoriesEditDialog.currentIdx >= 0
-                                    background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 4; border.color: cBorder; border.width: 1 }
-                                    palette.buttonText: cAccent; font.pixelSize: 10
+                                    id: resetPosBtn; text: tt("resetPosition"); flat: true; implicitHeight: 26; implicitWidth: 90; enabled: memoriesEditDialog.currentIdx >= 0
+                                    background: Rectangle { color: enabled ? (resetPosBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12)) : Qt.rgba(cText.r, cText.g, cText.b, 0.05); radius: 4; border.color: enabled ? (resetPosBtn.hovered ? cAccent : cBorder) : cBorder; border.width: 1; Behavior on color { ColorAnimation { duration: 150 } } }
+                                    palette.buttonText: enabled ? (resetPosBtn.hovered ? "#ffffff" : cAccent) : cSub; font.pixelSize: 10
                                     onClicked: {
                                         memoriesEditDialog.curOffsetX = 0; memoriesEditDialog.curOffsetY = 0;
                                         var item = memoriesEditDialog.screenshots[memoriesEditDialog.currentIdx];
@@ -2346,9 +2372,9 @@ Window {
                                     }
                                 }
                                 Button {
-                                    text: tt("resetScale"); flat: true; implicitHeight: 26; implicitWidth: 72; enabled: memoriesEditDialog.currentIdx >= 0
-                                    background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 4; border.color: cBorder; border.width: 1 }
-                                    palette.buttonText: cAccent; font.pixelSize: 10
+                                    id: resetScaleBtn; text: tt("resetScale"); flat: true; implicitHeight: 26; implicitWidth: 72; enabled: memoriesEditDialog.currentIdx >= 0
+                                    background: Rectangle { color: enabled ? (resetScaleBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12)) : Qt.rgba(cText.r, cText.g, cText.b, 0.05); radius: 4; border.color: enabled ? (resetScaleBtn.hovered ? cAccent : cBorder) : cBorder; border.width: 1; Behavior on color { ColorAnimation { duration: 150 } } }
+                                    palette.buttonText: enabled ? (resetScaleBtn.hovered ? "#ffffff" : cAccent) : cSub; font.pixelSize: 10
                                     onClicked: {
                                         memoriesEditDialog.curScale = 1.0;
                                         var item = memoriesEditDialog.screenshots[memoriesEditDialog.currentIdx];
@@ -2387,15 +2413,15 @@ Window {
                 Row {
                     anchors.centerIn: parent; spacing: 10
                     Button {
-                        text: tt("save"); flat: true; implicitHeight: 30; implicitWidth: 80
-                        background: Rectangle { color: cAccent; radius: 4 }
+                        id: saveMemBtn; text: tt("save"); flat: true; implicitHeight: 30; implicitWidth: 80
+                        background: Rectangle { color: saveMemBtn.hovered ? Qt.darker(cAccent, 1.2) : cAccent; radius: 4; Behavior on color { ColorAnimation { duration: 150 } } }
                         palette.buttonText: "#ffffff"; font.pixelSize: 12
                         onClicked: { memoriesEditDialog.saveSettings(); memoriesEditDialog.hide() }
                     }
                     Button {
-                        text: tt("close"); flat: true; implicitHeight: 30; implicitWidth: 80
-                        background: Rectangle { color: Qt.rgba(cText.r, cText.g, cText.b, 0.1); radius: 4; border.color: cBorder; border.width: 1 }
-                        palette.buttonText: cSub; font.pixelSize: 12
+                        id: closeMemBtn; text: tt("close"); flat: true; implicitHeight: 30; implicitWidth: 80
+                        background: Rectangle { color: closeMemBtn.hovered ? "#ff4444" : Qt.rgba(cText.r, cText.g, cText.b, 0.1); radius: 4; border.color: closeMemBtn.hovered ? "#ff4444" : cBorder; border.width: 1; Behavior on color { ColorAnimation { duration: 150 } } }
+                        palette.buttonText: closeMemBtn.hovered ? "#ffffff" : cSub; font.pixelSize: 12
                         onClicked: { memoriesEditDialog.saveSettings(); memoriesEditDialog.hide() }
                     }
                 }
@@ -2787,7 +2813,10 @@ Window {
                             Label { text: tt("customMode"); font.bold: true; color: isDark ? cSub : cText; font.pixelSize: 13; anchors.verticalCenter: parent.verticalCenter }
                             Item { width: parent.width - 100 - 60 - (isDark ? 100 : 0); height: 1 }
                             Label { visible: isDark; text: tt("customDisabledDark"); color: cSub; font.pixelSize: 11; anchors.verticalCenter: parent.verticalCenter }
-                            Switch { id: customSwitch; enabled: !isDark; checked: root.currentTheme === "custom"; onToggled: root.currentTheme = checked ? "custom" : "blue"
+                            Switch { id: customSwitch; enabled: !isDark; checked: root.currentTheme === "custom"; onToggled: {
+                                if (checked) { root.preCustomTheme = root.currentTheme; root.currentTheme = "custom" }
+                                else { root.currentTheme = root.preCustomTheme }
+                            }
                                 Connections { target: root; function onCurrentThemeChanged() { customSwitch.checked = (root.currentTheme === "custom") } }
                             }
                         }
@@ -2882,7 +2911,12 @@ Window {
                     Row { spacing: 8
                         BtnGhost { text: tt("selectImage"); onClicked: bgImageDialog.open() }
                         BtnGhost { text: tt("bgHistoryBtn"); onClicked: { bgHistoryDialog.refresh(); bgHistoryDialog.show() } }
-                        BtnGhost { text: tt("clearBg"); onClicked: root.bgImagePath = "" }
+                        Button {
+                            id: clearBgBtn; text: tt("clearBg"); flat: true
+                            background: Rectangle { color: clearBgBtn.hovered ? "#ff4444" : "#30ff4444"; radius: 8; border.color: "#ff4444"; border.width: 1; implicitWidth: 100; implicitHeight: 34; Behavior on color { ColorAnimation { duration: 150 } } }
+                            palette.buttonText: clearBgBtn.hovered ? "#ffffff" : "#ff4444"
+                            onClicked: { root.bgImagePath = ""; root.currentBgHistoryId = -1 }
+                        }
                     }
                     Label { text: tt("bgOpacity") + "：" + Math.round(root.bgOpacity*100)+"%"; color: cText; font.pixelSize: 12
                         visible: !(root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)) }
@@ -2936,7 +2970,7 @@ Window {
                             anchors.fill: parent; anchors.margins: 8; spacing: 10
                             Rectangle {
                                 width: 96; height: 74; radius: 6; color: cBorder; clip: true
-                                Image { anchors.fill: parent; visible: !isVideoFile(modelData.imagePath); source: modelData.imagePath.length > 0 ? "file:///" + modelData.imagePath : ""; fillMode: Image.PreserveAspectCrop }
+                                Image { anchors.fill: parent; visible: !isVideoFile(modelData.imagePath); source: modelData.imagePath.length > 0 ? "file:///" + modelData.imagePath.replace(/\\/g, "/") : ""; fillMode: Image.PreserveAspectCrop }
                                 // 视频文件占位符
                                 Rectangle { anchors.fill: parent; visible: isVideoFile(modelData.imagePath); color: "#1a1a1a"
                                     Text { anchors.centerIn: parent; text: "▶ MP4"; color: "#ffffff"; font.pixelSize: 14; font.bold: true }
@@ -2949,8 +2983,7 @@ Window {
                                 Text { text: tt("bgOpacity") + " " + Math.round(modelData.opacity * 100) + "%   " + tt("bgBlur") + " " + Math.round(modelData.blur * 100) + "%"; font.pixelSize: 11; color: cSub; visible: !isVideoFile(modelData.imagePath) }
                                 Row {
                                     spacing: 6; topPadding: 2
-                                    BtnGhost { text: tt("useFull"); implicitHeight: 26; onClicked: { root.bgImagePath = modelData.imagePath; root.bgOpacity = modelData.opacity; root.bgBlur = modelData.blur; bgHistoryDialog.close() } }
-                                    BtnGhost { text: tt("editBg"); visible: !isVideoFile(modelData.imagePath); implicitHeight: 26; onClicked: { editBgDialog.openWith(modelData.id, modelData.imagePath, modelData.opacity, modelData.blur) } }
+                                    BtnGhost { text: tt("useFull"); implicitHeight: 26; onClicked: { root.currentBgHistoryId = modelData.id; root.bgImagePath = modelData.imagePath; root.bgOpacity = modelData.opacity; root.bgBlur = modelData.blur; bgHistoryDialog.close() } }
                                     BtnGhost { text: tt("cropBtn"); visible: !isVideoFile(modelData.imagePath); implicitHeight: 26; onClicked: { cropDialog.openBg(modelData.imagePath) } }
                                     Button { text: tt("del"); flat: true; implicitHeight: 26; font.pixelSize: 12
                                         palette.buttonText: "#ff6666"
@@ -3008,14 +3041,14 @@ Window {
                         width: parent.width; height: 280; radius: 8; color: effDark ? "#1a1a24" : "#f5f5f8"; clip: true; border.color: cBorder; border.width: 1
                         Image {
                             anchors.fill: parent; visible: editBgDialog.imagePath.length > 0 && !editBgDialog.imagePath.toLowerCase().endsWith(".gif")
-                            source: visible ? "file:///" + editBgDialog.imagePath : ""
+                            source: visible ? "file:///" + editBgDialog.imagePath.replace(/\\/g, "/") : ""
                             fillMode: Image.PreserveAspectCrop; opacity: editBgDialog.editOpacity
                             layer.enabled: editBgDialog.editBlur > 0 && visible
                             layer.effect: MultiEffect { blurEnabled: true; blur: editBgDialog.editBlur; blurMax: 64 }
                         }
                         AnimatedImage {
                             anchors.fill: parent; visible: editBgDialog.imagePath.length > 0 && editBgDialog.imagePath.toLowerCase().endsWith(".gif")
-                            source: visible ? "file:///" + editBgDialog.imagePath : ""
+                            source: visible ? "file:///" + editBgDialog.imagePath.replace(/\\/g, "/") : ""
                             fillMode: Image.PreserveAspectCrop; opacity: editBgDialog.editOpacity
                             layer.enabled: editBgDialog.editBlur > 0 && visible
                             layer.effect: MultiEffect { blurEnabled: true; blur: editBgDialog.editBlur; blurMax: 64 }
@@ -3081,7 +3114,7 @@ Window {
                 BtnCancel { onClicked: { deleteBgDialog.accepted = false; deleteBgDialog.close() } }
                 BtnOk { onClicked: {
                     deleteBgDialog.accepted = true
-                    if (root.bgImagePath === deleteBgDialog.targetPath) root.bgImagePath = "";
+                    if (root.bgImagePath === deleteBgDialog.targetPath) { root.bgImagePath = ""; root.currentBgHistoryId = -1 }
                     dbManager.deleteBgImage(deleteBgDialog.targetId);
                     bgHistoryDialog.refresh();
                     deleteBgDialog.close();
@@ -3146,7 +3179,7 @@ Window {
                     gameListModel.refresh(searchField.text);
                 } else {
                     // 背景裁剪
-                    root.bgImagePath = result; dbManager.addBgImage(result, root.bgOpacity, root.bgBlur);
+                    root.bgImagePath = result; root.currentBgHistoryId = -1; dbManager.addBgImage(result, root.bgOpacity, root.bgBlur);
                 }
             }
             close();
@@ -3158,7 +3191,7 @@ Window {
             anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; spacing: 12
             Rectangle {
                 id: cropContainer; width: parent.width; height: 380; color: "black"; clip: true
-                Image { id: imagePreview; anchors.centerIn: parent; width: parent.width; height: parent.height; fillMode: Image.PreserveAspectFit; source: cropDialog.sourcePath.length > 0 ? "file:///" + cropDialog.sourcePath : ""; onStatusChanged: if (status === Image.Ready) cropDialog.calcLayout() }
+                Image { id: imagePreview; anchors.centerIn: parent; width: parent.width; height: parent.height; fillMode: Image.PreserveAspectFit; source: cropDialog.sourcePath.length > 0 ? "file:///" + cropDialog.sourcePath.replace(/\\/g, "/") : ""; onStatusChanged: if (status === Image.Ready) cropDialog.calcLayout() }
                 // 四个遮罩区域
                 Rectangle { color: "#80000000"; x: 0; y: 0; width: cropContainer.width; height: cropDialog.selY; visible: cropDialog.selW > 0 }
                 Rectangle { color: "#80000000"; x: 0; y: cropDialog.selY + cropDialog.selH; width: cropContainer.width; height: cropContainer.height - cropDialog.selY - cropDialog.selH; visible: cropDialog.selW > 0 }
@@ -3255,7 +3288,7 @@ Window {
                 Label { text: tt("dragToMove"); color: cSub; anchors.horizontalCenter: parent.horizontalCenter }
                 Row {
                     spacing: 8; anchors.horizontalCenter: parent.horizontalCenter
-                    Button { text: tt("useFull"); visible: cropDialog.mode === "bg"; onClicked: { root.bgImagePath = dbManager.importCover(cropDialog.sourcePath); dbManager.addBgImage(root.bgImagePath, root.bgOpacity, root.bgBlur); cropDialog.close(); }
+                    Button { text: tt("useFull"); visible: cropDialog.mode === "bg"; onClicked: { root.bgImagePath = dbManager.importCover(cropDialog.sourcePath); root.currentBgHistoryId = -1; dbManager.addBgImage(root.bgImagePath, root.bgOpacity, root.bgBlur); cropDialog.close(); }
                         background: Rectangle { color: cCard; radius: 4; border.color: cBorder; border.width: 1; implicitHeight: 32 } }
                     Button {
                         text: tt("replaceCover"); visible: cropDialog.mode === "cover" || cropDialog.mode === "coverDetail"
@@ -3297,9 +3330,9 @@ Window {
             if (isVideoFile(p)) {
                 // 视频复制副本到 data/bg_videos/，定位到副本（与图片裁剪后存 data/crops/ 一致）
                 var vp = dbManager.importBgVideo(p);
-                if (vp.length > 0) { root.bgImagePath = vp; dbManager.addBgImage(vp, root.bgOpacity, root.bgBlur); }
+                if (vp.length > 0) { root.bgImagePath = vp; root.currentBgHistoryId = -1; dbManager.addBgImage(vp, root.bgOpacity, root.bgBlur); }
             } else if (p.toLowerCase().endsWith(".gif")) {
-                root.bgImagePath = p; dbManager.addBgImage(p, root.bgOpacity, root.bgBlur);
+                root.bgImagePath = p; root.currentBgHistoryId = -1; dbManager.addBgImage(p, root.bgOpacity, root.bgBlur);
             } else { cropDialog.openBg(p); }
         }
     }
