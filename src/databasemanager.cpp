@@ -950,7 +950,7 @@ QVariantMap DatabaseManager::getTypeCounts()
     QVariantMap counts;
     QSqlQuery query;
     if (!query.exec(QStringLiteral("SELECT types FROM games"))) {
-        qWarning() << "[数据库] 类型统计失败:" << query.lastError().text();
+        qWarning() << "[数据库] TAG 统计失败:" << query.lastError().text();
         return counts;
     }
     while (query.next()) {
@@ -1013,15 +1013,16 @@ bool DatabaseManager::exportTxt(const QString &filePath)
             text += QStringLiteral("   %1 分").arg(query.value(2).toDouble(), 0, 'f', 1);
         if (!query.value(3).toString().isEmpty())
             text += QStringLiteral("   [%1]").arg(query.value(3).toString());
-        if (query.value(4).toInt() > 0)
-            text += QStringLiteral("   %1h").arg(query.value(4).toInt());
+        // 游玩日期（开始~结束）
+        if (!query.value(5).toString().isEmpty() || !query.value(6).toString().isEmpty())
+            text += QStringLiteral("   日期：%1~%2").arg(query.value(5).toString(), query.value(6).toString());
         text += "\n";
 
         const QJsonArray tArr = QJsonDocument::fromJson(query.value(1).toString().toUtf8()).array();
         if (!tArr.isEmpty()) {
             QStringList ts;
             for (const QJsonValue &v : tArr) ts << v.toString();
-            text += QStringLiteral("   类型：%1\n").arg(ts.join("、"));
+            text += QStringLiteral("   TAG：%1\n").arg(ts.join("、"));
         }
         if (!query.value(7).toString().isEmpty())
             text += QStringLiteral("   评价：%1\n").arg(query.value(7).toString());
@@ -1040,7 +1041,7 @@ bool DatabaseManager::exportCsv(const QString &filePath)
     query.exec(QStringLiteral(
         "SELECT name, cover_path, types, rating, status, play_time, start_date, finish_date, notes FROM games"));
 
-    QString csv = QStringLiteral("名称,封面路径,类型,评分,状态,游玩时长(小时),开始日期,完成日期,评价\n");
+    QString csv = QStringLiteral("名称,封面路径,TAG,评分,状态,开始日期,完成日期,评价\n");
     while (query.next()) {
         const QJsonArray tArr = QJsonDocument::fromJson(query.value(2).toString().toUtf8()).array();
         QStringList ts;
@@ -1052,7 +1053,6 @@ bool DatabaseManager::exportCsv(const QString &filePath)
             << csvCell(ts.join("/"))
             << QString::number(query.value(3).toDouble())
             << csvCell(query.value(4).toString())
-            << QString::number(query.value(5).toInt())
             << csvCell(query.value(6).toString())
             << csvCell(query.value(7).toString())
             << csvCell(query.value(8).toString());

@@ -77,7 +77,7 @@ Window {
             appTitle:"galgame 游玩记录", add:"➕ 添加", stats:"📊 统计",
             exportBtn:"⬆ 导出", importBtn:"⬇ 导入",
             search:"🔍 搜索游戏名称...", addTitle:"添加游戏",
-            name:"游戏名称（如：CLANNAD）", type:"类型，空格分隔（如：校园 恋爱）",
+            name:"游戏名称（如：CLANNAD）", type:"TAG，空格分隔（如：校园 恋爱）",
             rating:"评分 0-10（如：9.3）", selectCover:"选择封面",
             notes:"评价/感想...", save:"保存",
             totalGames:"总游戏", avgScore:"平均分", todo:"待玩",
@@ -85,19 +85,19 @@ Window {
             noCover:"无图", editTitle:"编辑游戏", deleteTitle:"删除游戏",
             statsTitle:"数据统计", saveModify:"保存修改",
             deleteConfirm:"确定删除「%1」吗？\n此操作不可撤销。",
-            warnName:"请填写游戏名称", warnType:"请填写类型（如：校园）",
+            warnName:"请填写游戏名称", warnType:"请选择 TAG（如：校园）",
             warnRating:"评分请填 0–10 的数字",
             sort:"排序", sortName:"名称", sortDate:"添加日期", sortRating:"评分",
             nightMode:"夜晚模式", clock:"显示时钟", language:"语言",
-            appearance:"外观设置", settings:"设置",
+            appearance:"外观设置",
             exportDefaultName:"galgame游玩记录",
             yearStr:"年", monthStr:"月", dayStr:"日", lunarPrefix:"农历",
             noMatchGame:"没找到匹配的游戏", emptyGameList:"还没有游戏\n点上方「➕ 添加」开始记录",
             fileBtn:"文件", warnTitle:"提示", selectCoverPic:"选择封面图片",
-            exampleLabel:"示例：", importTip:"提示：cover_path 为空则显示无图；types 为 JSON 数组字符串格式；play_time 为游玩时长（小时）；start_date/finish_date 格式为 YYYY-MM-DD",
+            exampleLabel:"示例：", importTip:"提示：cover_path 为空则显示无图；types 为 TAG 的 JSON 数组字符串格式；start_date/finish_date 为游玩日期，格式 YYYY-MM-DD（如 2026-07-17）",
             aaBbText:"AaBb 文字", aaBbDesc:"AaBb 说明",
             cBlue:"天蓝", cGreen:"绿", cYellow:"黄", cPink:"粉", cBlack:"黑", cGray:"灰", cWhite:"白",
-            playTime:"游玩时长（小时，选填）", hours:"小时",
+            playDate:"游玩日期", selectDate:"点击选择日期", toDate:"到", clearDate:"清除", confirm:"确定", noDate:"未设置", sun:"日", mon:"一", tue:"二", wed:"三", thu:"四", fri:"五", sat:"六",
             importTitle:"导入说明", exportTitle:"选择导出格式", file:"文件",
             deleteBg:"删除背景图片", bgHistory:"背景图片历史",
             editBg:"修改背景效果", crop:"选择背景区域",
@@ -110,6 +110,7 @@ Window {
             clearBg:"清除背景", effectPreview:"效果预览",
             videoMuted:"静音", videoSound:"声音",
             videoVolume:"音量", videoSoundModule:"视频背景声音",
+            videoRate:"倍速", videoPlay:"播放", videoPause:"暂停",
             dragToMove:"拖拽选区移动，拖拽四角/四边缩放，任意比例",
             hexCode:"十六进制色码", presetColors:"预设颜色",
             clickToSelect:"拖动 SV 方块和色相条选色，或点击预设色块，也可直接输入十六进制颜色码（如 #3A9FFF）",
@@ -119,7 +120,7 @@ Window {
             jsonFormat:"JSON（.json）— 完整结构化，可备份/导入",
             txtFormat:"TXT（.txt）— 纯文本，方便阅读",
             csvFormat:"Excel（.csv）— 表格，Excel/WPS 可打开",
-            importDesc:"导入文件为 JSON 格式（本程序导出的 .json 可直接导入）。完整字段：name、cover_path、types、rating、status、play_time、start_date、finish_date、notes。",
+            importDesc:"导入文件为 JSON 格式（本程序导出的 .json 可直接导入）。完整字段：name、cover_path、types（TAG 数组）、rating、status、start_date（开始日期）、finish_date（结束日期）、notes。",
             exportTo:"导出到...", importFrom:"从...导入",
             gameDetail:"游戏详情", memories:"回忆",
             addScreenshot:"添加回忆", delScreenshot:"删除回忆", add:"添加",
@@ -138,11 +139,12 @@ Window {
             imagePosition:"位置", resetPosition:"重置位置",
             carousel:"轮播",
             displayMode:"展示模式", gridMode:"网格", carouselMode:"轮播",
-            clickToEdit:"点击编辑", editName:"编辑名称", editRating:"编辑评分", editNotes:"编辑评价", editCover:"编辑封面", editType:"编辑类型", currentTypes:"当前类型", saveNotes:"保存", cancelEdit:"取消", typeOneHint:"输入一个类型即可",
+            clickToEdit:"点击编辑", editName:"编辑名称", editRating:"编辑评分", editNotes:"编辑评价", editCover:"编辑封面", saveNotes:"保存", cancelEdit:"取消",
             gameNotes:"游戏评价", playbackOrder:"播放顺序", deleteMemory:"删除",
             dragToAdjustPos:"拖拽图片调整位置", dragToReorder:"拖拽排序",
             rotate:"旋转", resetRotate:"重置旋转", brightness:"亮度", contrast:"对比度",
             resetAll:"全部重置",
+            tagTitle:"选择游戏 TAG", tagSystem:"系统默认 TAG", tagCustom:"用户自定义 TAG", tagSearch:"搜索 / 输入新 TAG", tagAdd:"新增 TAG", tagExists:"该 TAG 已存在", tagSelected:"已选", selectTag:"选 TAG", noTagHint:"未选择 TAG，点击右侧按钮选择",
             weekdays:["星期日","星期一","星期二","星期三","星期四","星期五","星期六"]
         },
         zh_TW: {
@@ -150,26 +152,26 @@ Window {
             exportBtn:"⬆ 匯出", importBtn:"⬇ 匯入",
             search:"🔍 搜尋遊戲名稱...", addTitle:"新增遊戲",
             name:"遊戲名稱（如：CLANNAD）",
-            type:"類型，空格分隔（如：校園 戀愛）", rating:"評分 0-10（如：9.3）",
+            type:"TAG，空格分隔（如：校園 戀愛）", rating:"評分 0-10（如：9.3）",
             selectCover:"選擇封面", notes:"評價/感想...", save:"儲存",
             totalGames:"總遊戲", avgScore:"平均分", todo:"待玩",
             playing:"進行中", done:"已完成", edit:"編輯", del:"刪除",
             noCover:"無圖", editTitle:"編輯遊戲", deleteTitle:"刪除遊戲",
             statsTitle:"數據統計", saveModify:"儲存修改",
             deleteConfirm:"確定刪除「%1」嗎？\n此操作不可撤銷。",
-            warnName:"請填寫遊戲名稱", warnType:"請填寫類型（如：校園）",
+            warnName:"請填寫遊戲名稱", warnType:"請選擇 TAG（如：校園）",
             warnRating:"評分請填 0–10 的數字",
             sort:"排序", sortName:"名稱", sortDate:"新增日期", sortRating:"評分",
             nightMode:"夜間模式", clock:"顯示時鐘", language:"語言",
-            appearance:"外觀設定", settings:"設定",
+            appearance:"外觀設定",
             exportDefaultName:"galgame遊玩記錄",
             yearStr:"年", monthStr:"月", dayStr:"日", lunarPrefix:"農曆",
             noMatchGame:"沒找到匹配的遊戲", emptyGameList:"還沒有遊戲\n點上方「➕ 新增」開始記錄",
             fileBtn:"檔案", warnTitle:"提示", selectCoverPic:"選擇封面圖片",
-            exampleLabel:"範例：", importTip:"提示：cover_path 為空則顯示無圖；types 為 JSON 陣列字串格式；play_time 為遊玩時長（小時）；start_date/finish_date 格式為 YYYY-MM-DD",
+            exampleLabel:"範例：", importTip:"提示：cover_path 為空則顯示無圖；types 為 TAG 的 JSON 陣列字串格式；start_date/finish_date 為遊玩日期，格式 YYYY-MM-DD（如 2026-07-17）",
             aaBbText:"AaBb 文字", aaBbDesc:"AaBb 說明",
             cBlue:"天藍", cGreen:"綠", cYellow:"黃", cPink:"粉", cBlack:"黑", cGray:"灰", cWhite:"白",
-            playTime:"遊玩時長（小時，選填）", hours:"小時",
+            playDate:"遊玩日期", selectDate:"點擊選擇日期", toDate:"到", clearDate:"清除", confirm:"確定", noDate:"未設定", sun:"日", mon:"一", tue:"二", wed:"三", thu:"四", fri:"五", sat:"六",
             importTitle:"匯入說明", exportTitle:"選擇匯出格式", file:"檔案",
             deleteBg:"刪除背景圖片", bgHistory:"背景圖片歷史",
             editBg:"修改背景效果", crop:"選擇背景區域",
@@ -182,6 +184,7 @@ Window {
             clearBg:"清除背景", effectPreview:"效果預覽",
             videoMuted:"靜音", videoSound:"聲音",
             videoVolume:"音量", videoSoundModule:"影片背景聲音",
+            videoRate:"倍速", videoPlay:"播放", videoPause:"暫停",
             dragToMove:"拖曳選區移動，拖曳四角/四邊縮放，任意比例",
             hexCode:"十六進位色碼", presetColors:"預設顏色",
             clickToSelect:"點擊色塊快速選色，或點擊大色塊開啟取色器，也可直接輸入十六進位顏色碼（如 #3A9FFF）",
@@ -192,7 +195,7 @@ Window {
             jsonFormat:"JSON（.json）— 完整結構化，可備份/匯入",
             txtFormat:"TXT（.txt）— 純文字，方便閱讀",
             csvFormat:"Excel（.csv）— 表格，Excel/WPS 可開啟",
-            importDesc:"匯入檔案為 JSON 格式（本程式匯出的 .json 可直接匯入）。完整欄位：name、cover_path、types、rating、status、play_time、start_date、finish_date、notes。",
+            importDesc:"匯入檔案為 JSON 格式（本程式匯出的 .json 可直接匯入）。完整欄位：name、cover_path、types（TAG 陣列）、rating、status、start_date（開始日期）、finish_date（結束日期）、notes。",
             exportTo:"匯出到...", importFrom:"從...匯入",
             gameDetail:"遊戲詳情", memories:"回憶",
             addScreenshot:"新增回憶", delScreenshot:"刪除回憶", add:"新增",
@@ -211,11 +214,12 @@ Window {
             imagePosition:"位置", resetPosition:"重置位置",
             carousel:"輪播",
             displayMode:"展示模式", gridMode:"網格", carouselMode:"輪播",
-            clickToEdit:"點擊編輯", editName:"編輯名稱", editRating:"編輯評分", editNotes:"編輯評價", editCover:"編輯封面", editType:"編輯類型", currentTypes:"當前類型", saveNotes:"保存", cancelEdit:"取消", typeOneHint:"輸入一個類型即可",
+            clickToEdit:"點擊編輯", editName:"編輯名稱", editRating:"編輯評分", editNotes:"編輯評價", editCover:"編輯封面", saveNotes:"保存", cancelEdit:"取消",
             gameNotes:"遊戲評價", playbackOrder:"播放順序", deleteMemory:"刪除",
             dragToAdjustPos:"拖曳圖片調整位置", dragToReorder:"拖曳排序",
             rotate:"旋轉", resetRotate:"重置旋轉", brightness:"亮度", contrast:"對比度",
             resetAll:"全部重置",
+            tagTitle:"選擇遊戲 TAG", tagSystem:"系統預設 TAG", tagCustom:"使用者自訂 TAG", tagSearch:"搜尋 / 輸入新 TAG", tagAdd:"新增 TAG", tagExists:"該 TAG 已存在", tagSelected:"已選", selectTag:"選 TAG", noTagHint:"未選擇 TAG，點擊右側按鈕選擇",
             weekdays:["星期日","星期一","星期二","星期三","星期四","星期五","星期六"]
         },
         en: {
@@ -231,7 +235,7 @@ Window {
             noCover:"No img", editTitle:"Edit Game", deleteTitle:"Delete Game",
             statsTitle:"Statistics", saveModify:"Save Changes",
             deleteConfirm:"Delete \"%1\"?\nThis cannot be undone.",
-            warnName:"Please enter the game name", warnType:"Please enter a type",
+            warnName:"Please enter the game name", warnType:"Please select a TAG (e.g. School)",
             warnRating:"Rating must be 0–10",
             sort:"Sort", sortName:"Name", sortDate:"Added Date", sortRating:"Rating",
             nightMode:"Night Mode", clock:"Show Clock", language:"Language",
@@ -240,10 +244,10 @@ Window {
             yearStr:"-", monthStr:"-", dayStr:"", lunarPrefix:"Lunar",
             noMatchGame:"No matching games found", emptyGameList:"No games yet\nClick「➕ Add」above to start recording",
             fileBtn:"File", warnTitle:"Notice", selectCoverPic:"Select Cover Image",
-            exampleLabel:"Example:", importTip:"Tip: empty cover_path shows no image; types is a JSON array string; play_time is play time in hours; start_date/finish_date format is YYYY-MM-DD",
+            exampleLabel:"Example:", importTip:"Tip: empty cover_path shows no image; types is a JSON array string of TAGs; start_date/finish_date is play date in YYYY-MM-DD format",
             aaBbText:"AaBb Text", aaBbDesc:"AaBb Desc",
             cBlue:"Blue", cGreen:"Green", cYellow:"Yellow", cPink:"Pink", cBlack:"Black", cGray:"Gray", cWhite:"White",
-            playTime:"Play Time (hours, optional)", hours:"hours",
+            playDate:"Play Date", selectDate:"Click to select date", toDate:"to", clearDate:"Clear", confirm:"OK", noDate:"Not set", sun:"Sun", mon:"Mon", tue:"Tue", wed:"Wed", thu:"Thu", fri:"Fri", sat:"Sat",
             importTitle:"Import Guide", exportTitle:"Select Export Format", file:"File",
             deleteBg:"Delete Background", bgHistory:"Background History",
             editBg:"Edit Background", crop:"Select Crop Area",
@@ -256,6 +260,7 @@ Window {
             clearBg:"Clear Background", effectPreview:"Effect Preview",
             videoMuted:"Muted", videoSound:"Sound",
             videoVolume:"Volume", videoSoundModule:"Video Background Sound",
+            videoRate:"Speed", videoPlay:"Play", videoPause:"Pause",
             dragToMove:"Drag to move selection, drag corners/edges to resize",
             hexCode:"Hex Code", presetColors:"Preset Colors",
             clickToSelect:"Click swatches to select, or click large swatch to open color picker, or enter hex code (e.g. #3A9FFF)",
@@ -265,7 +270,7 @@ Window {
             jsonFormat:"JSON (.json) — Complete structure, for backup/import",
             txtFormat:"TXT (.txt) — Plain text, easy to read",
             csvFormat:"Excel (.csv) — Table format, openable in Excel/WPS",
-            importDesc:"Import file must be JSON format (.json exported by this app can be imported directly). Complete fields: name, cover_path, types, rating, status, play_time, start_date, finish_date, notes.",
+            importDesc:"Import file must be JSON format (.json exported by this app can be imported directly). Complete fields: name, cover_path, types (TAG array), rating, status, start_date (start date), finish_date (finish date), notes.",
             exportTo:"Export to...", importFrom:"Import from...",
             gameDetail:"Game Details", memories:"Memories",
             addScreenshot:"Add Memory", delScreenshot:"Delete Memory", add:"Add",
@@ -284,11 +289,12 @@ Window {
             imagePosition:"Position", resetPosition:"Reset Position",
             carousel:"Carousel",
             displayMode:"Display", gridMode:"Grid", carouselMode:"Carousel",
-            clickToEdit:"Click to edit", editName:"Edit Name", editRating:"Edit Rating", editNotes:"Edit Notes", editCover:"Edit Cover", editType:"Edit Types", currentTypes:"Current Types", saveNotes:"Save", cancelEdit:"Cancel", typeOneHint:"Enter one type",
+            clickToEdit:"Click to edit", editName:"Edit Name", editRating:"Edit Rating", editNotes:"Edit Notes", editCover:"Edit Cover", saveNotes:"Save", cancelEdit:"Cancel",
             gameNotes:"Notes", playbackOrder:"Order", deleteMemory:"Delete",
             dragToAdjustPos:"Drag image to adjust position", dragToReorder:"Drag to reorder",
             rotate:"Rotate", resetRotate:"Reset Rotate", brightness:"Brightness", contrast:"Contrast",
             resetAll:"Reset All",
+            tagTitle:"Select Game TAG", tagSystem:"System Default TAG", tagCustom:"User Custom TAG", tagSearch:"Search / Enter new TAG", tagAdd:"Add TAG", tagExists:"This TAG already exists", tagSelected:"Selected", selectTag:"Select TAG", noTagHint:"No TAG selected, click button to choose",
             weekdays:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
         },
         ja: {
@@ -309,15 +315,15 @@ Window {
             warnRating:"評価は 0–10 の数値で",
             sort:"並び替え", sortName:"名前", sortDate:"追加日", sortRating:"評価",
             nightMode:"ダークモード", clock:"時計表示", language:"言語",
-            appearance:"外観設定", settings:"設定",
+            appearance:"外観設定",
             exportDefaultName:"galgameプレイ記録",
             yearStr:"年", monthStr:"月", dayStr:"日", lunarPrefix:"農暦",
             noMatchGame:"一致するゲームが見つかりません", emptyGameList:"まだゲームがありません\n上の「➕ 追加」をクリックして記録を開始",
             fileBtn:"ファイル", warnTitle:"通知", selectCoverPic:"カバー画像選択",
-            exampleLabel:"例：", importTip:"ヒント：cover_path が空なら画像なし；types は JSON 配列文字列；play_time はプレイ時間（時間）；start_date/finish_date は YYYY-MM-DD 形式",
+            exampleLabel:"例：", importTip:"ヒント：cover_path が空なら画像なし；types は TAG の JSON 配列文字列；start_date/finish_date はプレイ日付、YYYY-MM-DD 形式（例：2026-07-17）",
             aaBbText:"AaBb テキスト", aaBbDesc:"AaBb 説明",
             cBlue:"青", cGreen:"緑", cYellow:"黄", cPink:"ピンク", cBlack:"黒", cGray:"灰", cWhite:"白",
-            playTime:"プレイ時間（時間、任意）", hours:"時間",
+            playDate:"プレイ日付", selectDate:"クリックで日付選択", toDate:"〜", clearDate:"クリア", confirm:"確定", noDate:"未設定", sun:"日", mon:"月", tue:"火", wed:"水", thu:"木", fri:"金", sat:"土",
             importTitle:"インポートガイド", exportTitle:"書出し形式選択", file:"ファイル",
             deleteBg:"背景画像削除", bgHistory:"背景履歴",
             editBg:"背景編集", crop:"切抜き領域選択",
@@ -330,6 +336,7 @@ Window {
             clearBg:"背景クリア", effectPreview:"効果プレビュー",
             videoMuted:"ミュート", videoSound:"音声",
             videoVolume:"音量", videoSoundModule:"動画背景サウンド",
+            videoRate:"再生速度", videoPlay:"再生", videoPause:"一時停止",
             dragToMove:"選択領域をドラッグ移動、四隅/四辺をドラッグしてサイズ変更",
             hexCode:"16進コード", presetColors:"プリセットカラー",
             clickToSelect:"SVブロックと色相バーをドラッグして選択、またはスウォッチをクリック、または16進コードを直接入力（例：#3A9FFF）",
@@ -339,7 +346,7 @@ Window {
             jsonFormat:"JSON（.json）— 完全構造化、バックアップ/インポート用",
             txtFormat:"TXT（.txt）— プレーンテキスト、閲覧用",
             csvFormat:"Excel（.csv）— 表形式、Excel/WPSで開ける",
-            importDesc:"インポートファイルはJSON形式（このアプリケーションがエクスポートした.jsonを直接インポート可能）。完全なフィールド：name、cover_path、types、rating、status、play_time、start_date、finish_date、notes。",
+            importDesc:"インポートファイルはJSON形式（このアプリケーションがエクスポートした.jsonを直接インポート可能）。完全なフィールド：name、cover_path、types（TAG 配列）、rating、status、start_date（開始日）、finish_date（終了日）、notes。",
             exportTo:"書出し先...", importFrom:"読込元...",
             gameDetail:"ゲーム詳細", memories:"思い出",
             addScreenshot:"思い出追加", delScreenshot:"思い出削除", add:"追加",
@@ -358,11 +365,12 @@ Window {
             imagePosition:"位置", resetPosition:"位置リセット",
             carousel:"スライド",
             displayMode:"表示モード", gridMode:"グリッド", carouselMode:"スライド",
-            clickToEdit:"クリック編集", editName:"名前編集", editRating:"評価編集", editNotes:"メモ編集", editCover:"カバー編集", editType:"タイプ編集", currentTypes:"現在のタイプ", saveNotes:"保存", cancelEdit:"キャンセル", typeOneHint:"一つのタイプを入力",
+            clickToEdit:"クリック編集", editName:"名前編集", editRating:"評価編集", editNotes:"メモ編集", editCover:"カバー編集", saveNotes:"保存", cancelEdit:"キャンセル",
             gameNotes:"メモ", playbackOrder:"順序", deleteMemory:"削除",
             dragToAdjustPos:"画像をドラッグして位置調整", dragToReorder:"ドラッグで並べ替え",
             rotate:"回転", resetRotate:"回転リセット", brightness:"明るさ", contrast:"コントラスト",
             resetAll:"全リセット",
+            tagTitle:"ゲーム TAG 選択", tagSystem:"システム既定 TAG", tagCustom:"ユーザー自定义 TAG", tagSearch:"検索 / 新規 TAG 入力", tagAdd:"TAG 追加", tagExists:"この TAG は既に存在します", tagSelected:"選択済", selectTag:"TAG 選択", noTagHint:"TAG 未選択、右ボタンをクリックして選択",
             weekdays:["日曜日","月曜日","火曜日","水曜日","木曜日","金曜日","土曜日"]
         }
     })
@@ -406,7 +414,12 @@ Window {
     property real bgBlur: 0.5
     property bool bgVideoMuted: true   // 视频背景静音模式（默认静音）
     property real bgVideoVolume: 1.0   // 视频背景音量（0.0-1.0）
+    property real bgVideoRate: 1.0   // 视频背景播放速度（0.25-3.0），持久化（用户偏好）
+    property bool bgVideoPaused: false   // 视频背景手动暂停（临时控制，不持久化；切换视频自动播放）
     property int currentBgHistoryId: -1   // 当前背景对应的历史记录 ID（-1=未对应历史记录）
+    // 游戏 TAG 系统：系统默认 31 个 + 用户自定义（持久化到数据库 customTags 键，JSON 数组）
+    readonly property var systemTags: ["R18","恋爱","校园","剧情作","百合","废萌","女装","异世界","后宫","奇幻","超能力","悬疑","冒险","萝莉","妹妹","纯爱","NTR","魔法","姐姐","凌辱","治愈","致郁","搞笑","日常","伪娘","背德","喜剧","傲娇","兽耳","单线结局","多线结局"]
+    property var customTags: []   // 用户自定义 TAG 列表（持久化）
     readonly property var themeAccents: ({
         light: { blue:"#3a9fff", green:"#3fb958", yellow:"#f0b400", pink:"#ff7aa8", black:"#3a3a3a", gray:"#888888", white:"#bbbbbb", custom:customAccent },
         dark:  { blue:"#5db5ff", green:"#5dd474", yellow:"#ffc94d", pink:"#ff9ac0", black:"#666666", gray:"#999999", white:"#e8e8e8", custom:customAccent }
@@ -446,6 +459,13 @@ Window {
         v = dbManager.getSetting("bgBlur"); if (v.length > 0) root.bgBlur = parseFloat(v);
         v = dbManager.getSetting("bgVideoMuted"); if (v.length > 0) root.bgVideoMuted = (v === "1");
         v = dbManager.getSetting("bgVideoVolume"); if (v.length > 0) root.bgVideoVolume = parseFloat(v);
+        v = dbManager.getSetting("bgVideoRate"); if (v.length > 0) root.bgVideoRate = parseFloat(v);
+        // 加载用户自定义 TAG（JSON 数组持久化）
+        v = dbManager.getSetting("customTags");
+        if (v.length > 0) {
+            try { root.customTags = JSON.parse(v) } catch(e) { root.customTags = [] }
+        }
+        // bgVideoPaused 不持久化（临时控制，启动时默认 false 自动播放）
     }
 
     Component.onCompleted: {
@@ -502,6 +522,8 @@ Window {
     }
     onBgVideoMutedChanged: dbManager.setSetting("bgVideoMuted", root.bgVideoMuted ? "1" : "0")
     onBgVideoVolumeChanged: dbManager.setSetting("bgVideoVolume", root.bgVideoVolume.toString())
+    onBgVideoRateChanged: dbManager.setSetting("bgVideoRate", root.bgVideoRate.toString())
+    // bgVideoPaused 不持久化
 
     function jsonToText(jsonStr) { try { return JSON.parse(jsonStr).join(" "); } catch(e) { return jsonStr; } }
     function urlToPath(u) {
@@ -515,6 +537,14 @@ Window {
     function isVideoFile(path) {
         return path.toLowerCase().endsWith(".mp4");
     }
+    // 毫秒时间转 mm:ss 格式（视频进度条时间显示）
+    function formatTime(ms) {
+        if (!ms || ms <= 0) return "00:00"
+        var s = Math.floor(ms / 1000)
+        var m = Math.floor(s / 60)
+        s = s % 60
+        return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s
+    }
     // 游戏状态：数据库统一存中文（待玩/进行中/已完成），显示时通过本函数翻译
     readonly property var statusKeys: ["待玩", "进行中", "已完成"]
     function statusText(s) {
@@ -522,6 +552,36 @@ Window {
         if (s === "进行中") return tt("playing");
         if (s === "已完成") return tt("done");
         return s;
+    }
+    // 主页游戏卡片：tag 最多展示5个，超出显示"…"，并拼接状态文本
+    function formatTagsWithStatus(typesJson, status) {
+        var arr = jsonToText(typesJson).split(/\s+/).filter(function(s){return s.length>0})
+        var shown = arr.slice(0, 5).join(" ")
+        if (arr.length > 5) shown += " …"
+        return shown + "   ·   " + statusText(status)
+    }
+    // ===== 日期格式化 helper =====
+    // YYYY-MM-DD → "20xx年x月x日"，空字符串返回空
+    function formatDate(dateStr) {
+        if (!dateStr || dateStr.length === 0) return ""
+        var parts = dateStr.split("-")
+        if (parts.length !== 3) return dateStr
+        return parts[0] + tt("yearStr") + parseInt(parts[1], 10) + tt("monthStr") + parseInt(parts[2], 10) + tt("dayStr")
+    }
+    // Date 对象 → "YYYY-MM-DD" 字符串
+    function dateToYMD(date) {
+        if (!date) return ""
+        var y = date.getFullYear()
+        var m = date.getMonth() + 1
+        var d = date.getDate()
+        return y + "-" + (m < 10 ? "0" + m : m) + "-" + (d < 10 ? "0" + d : d)
+    }
+    // "YYYY-MM-DD" → Date 对象
+    function ymdToDate(dateStr) {
+        if (!dateStr || dateStr.length === 0) return new Date()
+        var parts = dateStr.split("-")
+        if (parts.length !== 3) return new Date()
+        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
     }
     // 农历转换
     readonly property var lunarInfo: [0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0]
@@ -876,21 +936,34 @@ Window {
         loops: MediaPlayer.Infinite   // 循环播放
         videoOutput: bgVideo
         audioOutput: AudioOutput { id: bgAudioOutput; volume: root.bgVideoMuted ? 0.0 : root.bgVideoVolume }
-        // 视频文件且窗口可见时播放，否则停止
+        playbackRate: root.bgVideoRate   // 播放速度（0.25-3.0）
+        // 视频文件且窗口可见时播放/暂停，否则停止；bgVideoPaused 由用户控制
         onSourceChanged: {
-            if (root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath) && root.visible) play()
-            else stop()
+            if (root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath) && root.visible) {
+                if (root.bgVideoPaused) bgMediaPlayer.pause()
+                else bgMediaPlayer.play()
+            } else bgMediaPlayer.stop()
         }
     }
     Connections {
         target: root
         function onVisibleChanged() {
+            if (root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath) && root.visible) {
+                if (root.bgVideoPaused) bgMediaPlayer.pause()
+                else bgMediaPlayer.play()
+            } else bgMediaPlayer.stop()
+        }
+        function onBgImagePathChanged() {
+            // 切换视频时重置暂停状态（自动播放新视频）
+            root.bgVideoPaused = false
             if (root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath) && root.visible) bgMediaPlayer.play()
             else bgMediaPlayer.stop()
         }
-        function onBgImagePathChanged() {
-            if (root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath) && root.visible) bgMediaPlayer.play()
-            else bgMediaPlayer.stop()
+        function onBgVideoPausedChanged() {
+            if (root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath) && root.visible) {
+                if (root.bgVideoPaused) bgMediaPlayer.pause()
+                else bgMediaPlayer.play()
+            }
         }
     }
 
@@ -922,7 +995,6 @@ Window {
                 onClicked: langMenu.open()
                 Menu {
                     id: langMenu
-                    property var langCodes: ["zh_CN", "zh_TW", "en", "ja"]
                     MenuItem { text: "简体中文"; checkable: true; checked: root.currentLang === "zh_CN"; onTriggered: root.currentLang = "zh_CN" }
                     MenuItem { text: "繁體中文"; checkable: true; checked: root.currentLang === "zh_TW"; onTriggered: root.currentLang = "zh_TW" }
                     MenuItem { text: "English"; checkable: true; checked: root.currentLang === "en"; onTriggered: root.currentLang = "en" }
@@ -958,12 +1030,20 @@ Window {
                 onClicked: clockVisible = !clockVisible
             }
             Button {
-                id: settingsBtn; text: "⚙️"; flat: true
+                id: appearanceBtn; text: "👕"; flat: true
                 layer.enabled: true
                 layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
-                background: Rectangle { color: settingsBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: settingsBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
-                palette.buttonText: settingsBtn.hovered ? "#ffffff" : cAccent
-                onClicked: settingsDialog.show()
+                background: Rectangle { color: appearanceBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: appearanceBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
+                palette.buttonText: appearanceBtn.hovered ? "#ffffff" : cAccent
+                onClicked: appearanceDialog.show()
+            }
+            Button {
+                id: fileBtn; text: "📁"; flat: true
+                layer.enabled: true
+                layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.4; shadowVerticalOffset: 2 }
+                background: Rectangle { color: fileBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.12); radius: 8; border.color: fileBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1; implicitHeight: 32; implicitWidth: 36; Behavior on color { ColorAnimation { duration: 150 } } }
+                palette.buttonText: fileBtn.hovered ? "#ffffff" : cAccent
+                onClicked: fileDialog.show()
             }
             // 窗口控制按钮（最小化/最大化/关闭）
             Button {
@@ -1076,16 +1156,28 @@ Window {
                         { labelKey: "done", prop: "doneCount", accent: "#5bd06d", status: "已完成" }
                     ]
                     delegate: Rectangle {
+                        id: statBtn
                         width: (statsBar.width - 8 * 3) / 4; height: 56; radius: 8
-                        color: root.statusFilter === modelData.status ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.75) : Qt.rgba(cCard.r, cCard.g, cCard.b, 0.7)
-                        border.color: root.statusFilter === modelData.status ? cAccent : cBorder; border.width: 1
-                        Rectangle { anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom; width: 4; color: cAccent; radius: 2 }
+                        // 选中态：cAccent 0.75；hover 态：cCard 加 cAccent 0.18 着色；默认：cCard 0.7
+                        color: root.statusFilter === modelData.status
+                            ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.75)
+                            : (statHover.containsMouse ? Qt.rgba(cCard.r + (cAccent.r - cCard.r) * 0.18, cCard.g + (cAccent.g - cCard.g) * 0.18, cCard.b + (cAccent.b - cCard.b) * 0.18, 0.9)
+                                : Qt.rgba(cCard.r, cCard.g, cCard.b, 0.7))
+                        border.color: root.statusFilter === modelData.status ? cAccent : (statHover.containsMouse ? cAccent : cBorder); border.width: 1
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
                         Column { anchors.centerIn: parent; spacing: 2
                             Label { text: tt(modelData.labelKey); font.pixelSize: 11; color: root.statusFilter === modelData.status ? "#ffffff" : cSub; anchors.horizontalCenter: parent.horizontalCenter }
                             Label { text: root[modelData.prop]; font.bold: true; font.pixelSize: 18; color: root.statusFilter === modelData.status ? "#ffffff" : cText; anchors.horizontalCenter: parent.horizontalCenter }
                         }
-                        MouseArea { anchors.fill: parent; enabled: modelData.status !== "__none__"; cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: { if (modelData.status === "__none__") return; root.statusFilter = (root.statusFilter === modelData.status) ? "" : modelData.status; reloadList(); } }
+                        MouseArea {
+                            id: statHover
+                            anchors.fill: parent
+                            enabled: modelData.status !== "__none__"
+                            hoverEnabled: true   // 启用 hover 检测，containsMouse 才会更新
+                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            onClicked: { if (modelData.status === "__none__") return; root.statusFilter = (root.statusFilter === modelData.status) ? "" : modelData.status; reloadList(); }
+                        }
                     }
                 }
             }
@@ -1161,7 +1253,7 @@ Window {
             color: Qt.rgba(cCard.r, cCard.g, cCard.b, 0.75); border.color: cBorder; border.width: 1
             MouseArea {
                 anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                onClicked: gameDetailDialog.openWith(gameId, gameName, gameCover, gameTypes, gameRating, gameStatus, gamePlayTime, gameNotes)
+                onClicked: gameDetailDialog.openWith(gameId, gameName, gameCover, gameTypes, gameRating, gameStatus, gameStartDate, gameFinishDate, gameNotes)
             }
             Item {
                 id: coverItem
@@ -1172,7 +1264,7 @@ Window {
             Column {
                 anchors.left: coverItem.right; anchors.verticalCenter: parent.verticalCenter; anchors.leftMargin: 10; anchors.right: ratingBox.left; anchors.rightMargin: 8; spacing: 3
                 Text { width: parent.width; text: gameName; font.bold: true; font.pixelSize: 14; color: cText; elide: Text.ElideRight }
-                Text { width: parent.width; text: jsonToText(gameTypes) + "   ·   " + statusText(gameStatus); font.pixelSize: 12; color: cSub; elide: Text.ElideRight }
+                Text { width: parent.width; text: formatTagsWithStatus(gameTypes, gameStatus); font.pixelSize: 12; color: cSub; elide: Text.ElideRight }
             }
             // 评分显示（最右边，大字体，垂直居中）
             Item {
@@ -1205,42 +1297,204 @@ Window {
         onContentYChanged: { mainScrollSB.opacity = 1.0; sbHideTimer.restart() }
     }   // Flickable
 
-    // ===== 视频背景声音模块（仅视频背景时显示，固定在主页面右下角，透明背景无边框）=====
+    // ===== 视频背景工具模块（仅视频背景时显示，固定在主页面底部，透明背景无边框）=====
+    // 布局：进度条水平居中 + 右侧倍速/声音按钮 Row（用户第87轮选定方案B）
+    // 播放/暂停按钮：32×32 正方形；声音控制：喇叭图标按钮 + Popup 浮动面板（含静音+音量条）
     Rectangle {
         id: videoSoundBar
         parent: bgRect
-        anchors.right: parent.right; anchors.bottom: parent.bottom
+        anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
         anchors.margins: 12
-        height: 44; width: soundRow.implicitWidth + 24
+        height: 44
         visible: root.bgImagePath.length > 0 && isVideoFile(root.bgImagePath)
         color: "transparent"; border.width: 0
         radius: 8
+
+        // 中间区域：进度条水平居中（含 hover 时间标签）
+        Item {
+            id: videoProgressWrap
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            width: videoProgress.width; height: videoProgress.height
+            RoundSlider {
+                id: videoProgress
+                from: 0
+                to: bgMediaPlayer.duration > 0 ? bgMediaPlayer.duration : 1
+                // 进度条宽度：工具框宽度减去右侧按钮组宽度 + 间距，限制最大 400 最小 180
+                width: Math.max(180, Math.min(400, videoSoundBar.width - rightCtrlRow.implicitWidth - 40))
+                enabled: bgMediaPlayer.duration > 0
+                Binding on value {
+                    value: bgMediaPlayer.position
+                    when: !videoProgress.pressed
+                    restoreMode: Binding.RestoreBinding
+                }
+                onMoved: bgMediaPlayer.position = value
+            }
+            HoverHandler {
+                id: videoProgressHover
+                target: videoProgress
+            }
+            // 时间标签（浮在进度条上方，hover 或拖动时显示）
+            Rectangle {
+                id: videoTimeLabel
+                visible: (videoProgressHover.hovered || videoProgress.pressed) && bgMediaPlayer.duration > 0
+                anchors.bottom: videoProgress.top
+                anchors.bottomMargin: 4
+                anchors.horizontalCenter: videoProgress.horizontalCenter
+                color: "#cc000000"
+                radius: 4
+                width: timeLabelText.implicitWidth + 12
+                height: timeLabelText.implicitHeight + 4
+                Label {
+                    id: timeLabelText
+                    anchors.centerIn: parent
+                    text: formatTime(videoProgress.value) + " / " + formatTime(bgMediaPlayer.duration)
+                    color: "#ffffff"
+                    font.pixelSize: 11
+                }
+            }
+        }
+
+        // 按钮组：播放/暂停（正方形）+ 倍速 + 声音（紧贴进度条右侧，随进度条居中而靠近中间）
         Row {
-            id: soundRow
-            anchors.centerIn: parent; spacing: 12
-            // 静音/声音切换按钮
+            id: rightCtrlRow
+            anchors.left: videoProgressWrap.right   // 锚定进度条右侧（用户要求按钮往中间靠，紧贴进度条）
+            anchors.leftMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
+
+            // 播放/暂停按钮（32×32 正方形）
             Button {
-                id: videoMuteBtn
-                text: root.bgVideoMuted ? "🔇 " + tt("videoMuted") : "🔊 " + tt("videoSound")
+                id: videoPlayBtn
+                text: root.bgVideoPaused ? "▶" : "■"
                 flat: true
                 background: Rectangle {
-                    color: videoMuteBtn.hovered ? cAccent : (root.bgVideoMuted ? Qt.rgba(cSub.r, cSub.g, cSub.b, 0.18) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.18))
-                    radius: 8; border.color: videoMuteBtn.hovered ? cAccent : (root.bgVideoMuted ? cSub : cAccent); border.width: 1; implicitHeight: 30
+                    color: videoPlayBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.18)
+                    radius: 8; border.color: videoPlayBtn.hovered ? cAccent : cAccent; border.width: 1
+                    implicitWidth: 32; implicitHeight: 32   // 正方形固定尺寸
                     Behavior on color { ColorAnimation { duration: 150 } }
                 }
-                palette.buttonText: videoMuteBtn.hovered ? "#ffffff" : (root.bgVideoMuted ? cSub : cAccent)
-                onClicked: root.bgVideoMuted = !root.bgVideoMuted
+                palette.buttonText: videoPlayBtn.hovered ? "#ffffff" : cAccent
+                onClicked: root.bgVideoPaused = !root.bgVideoPaused
             }
-            // 音量标签
-            Label { text: tt("videoVolume") + "：" + Math.round(root.bgVideoVolume * 100) + "%"; color: cText; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter }
-            // 音量滑块
-            RoundSlider {
-                from: 0.0; to: 1.0; value: root.bgVideoVolume
-                onMoved: root.bgVideoVolume = value
-                width: 180
-                enabled: !root.bgVideoMuted
-                opacity: root.bgVideoMuted ? 0.5 : 1.0
-                anchors.verticalCenter: parent.verticalCenter
+
+            // 倍速按钮（文字"倍速"+当前值，点击 Menu 选择 0.25x-3.0x）
+            Button {
+                id: videoRateBtn
+                text: tt("videoRate") + " " + root.bgVideoRate + "x"
+                flat: true
+                background: Rectangle {
+                    color: videoRateBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.18)
+                    radius: 8; border.color: videoRateBtn.hovered ? cAccent : cAccent; border.width: 1; implicitHeight: 32
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                }
+                palette.buttonText: videoRateBtn.hovered ? "#ffffff" : cAccent
+                onClicked: videoRateMenu.open()
+                Menu {
+                    id: videoRateMenu
+                    MenuItem { text: "0.25x"; checkable: true; checked: Math.abs(root.bgVideoRate - 0.25) < 0.01; onTriggered: root.bgVideoRate = 0.25 }
+                    MenuItem { text: "0.5x";  checkable: true; checked: Math.abs(root.bgVideoRate - 0.5)  < 0.01; onTriggered: root.bgVideoRate = 0.5  }
+                    MenuItem { text: "0.75x"; checkable: true; checked: Math.abs(root.bgVideoRate - 0.75) < 0.01; onTriggered: root.bgVideoRate = 0.75 }
+                    MenuItem { text: "1.0x";  checkable: true; checked: Math.abs(root.bgVideoRate - 1.0)  < 0.01; onTriggered: root.bgVideoRate = 1.0  }
+                    MenuItem { text: "1.25x"; checkable: true; checked: Math.abs(root.bgVideoRate - 1.25) < 0.01; onTriggered: root.bgVideoRate = 1.25 }
+                    MenuItem { text: "1.5x";  checkable: true; checked: Math.abs(root.bgVideoRate - 1.5)  < 0.01; onTriggered: root.bgVideoRate = 1.5  }
+                    MenuItem { text: "2.0x";  checkable: true; checked: Math.abs(root.bgVideoRate - 2.0)  < 0.01; onTriggered: root.bgVideoRate = 2.0  }
+                    MenuItem { text: "3.0x";  checkable: true; checked: Math.abs(root.bgVideoRate - 3.0)  < 0.01; onTriggered: root.bgVideoRate = 3.0  }
+                }
+            }
+
+            // 声音控制按钮（仅喇叭图标 🔊/🔇，点击弹出 Popup 浮动面板含静音+竖直音量条）
+            Button {
+                id: videoSoundBtn
+                text: root.bgVideoMuted ? "🔇" : "🔊"
+                flat: true
+                background: Rectangle {
+                    color: videoSoundBtn.hovered ? cAccent : (root.bgVideoMuted ? Qt.rgba(cSub.r, cSub.g, cSub.b, 0.18) : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.18))
+                    radius: 8; border.color: videoSoundBtn.hovered ? cAccent : (root.bgVideoMuted ? cSub : cAccent); border.width: 1
+                    implicitWidth: 32; implicitHeight: 32   // 与播放暂停按钮一致正方形
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                }
+                palette.buttonText: videoSoundBtn.hovered ? "#ffffff" : (root.bgVideoMuted ? cSub : cAccent)
+                onClicked: videoSoundPopup.open()
+
+                // Popup 浮动面板（竖直布局，类似 Windows 任务栏声音弹窗）
+                Popup {
+                    id: videoSoundPopup
+                    x: (videoSoundBtn.width - width) / 2   // 水平居中于按钮
+                    y: -height - 8   // 显示在按钮上方
+                    width: 80; height: 220   // 竖直长方形面板
+                    modal: false; dim: false
+                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                    background: Rectangle {
+                        color: cCard; radius: 8; border.color: cBorder; border.width: 1
+                        layer.enabled: true
+                        layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#80000000"; shadowBlur: 0.5; shadowVerticalOffset: 2 }
+                    }
+                    padding: 10
+                    contentItem: Column {
+                        spacing: 8
+                        // 顶部：静音按钮（喇叭图标，点击切换静音）
+                        Button {
+                            id: popupMuteBtn
+                            text: root.bgVideoMuted ? "🔇" : "🔊"
+                            flat: true
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            background: Rectangle {
+                                color: popupMuteBtn.hovered ? cAccent : "transparent"
+                                radius: 6; border.color: popupMuteBtn.hovered ? cAccent : "transparent"; border.width: 1
+                                implicitWidth: 36; implicitHeight: 32
+                                Behavior on color { ColorAnimation { duration: 150 } }
+                            }
+                            palette.buttonText: popupMuteBtn.hovered ? "#ffffff" : (root.bgVideoMuted ? cSub : cAccent)
+                            onClicked: root.bgVideoMuted = !root.bgVideoMuted
+                        }
+                        // 音量值标签
+                        Label {
+                            text: Math.round(root.bgVideoVolume * 100) + "%"
+                            color: cText; font.pixelSize: 11
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        // 竖直音量滑块（用原生 Slider + orientation:Qt.Vertical，RoundSlider 不支持竖直）
+                        // from:0.0 to:1.0 正常方向：value=0 在底部=音量0，value=1 在顶部=音量最大
+                        // 往上拖 handle=音量变大，往下拖=音量变小（符合 Windows 任务栏音量条习惯）
+                        // 注意：竖直 Slider 的 visualPosition 方向不确定，改用 value 直接计算位置最可靠
+                        Slider {
+                            id: popupVolumeSlider
+                            orientation: Qt.Vertical
+                            from: 0.0; to: 1.0; value: root.bgVideoVolume
+                            onMoved: root.bgVideoVolume = value
+                            width: 32; height: 120   // 显式宽高避免在 Column 中尺寸为 0
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            enabled: !root.bgVideoMuted
+                            opacity: root.bgVideoMuted ? 0.5 : 1.0
+                            // 自定义样式与 RoundSlider 视觉一致（竖直版）
+                            background: Rectangle {
+                                implicitWidth: 32; implicitHeight: 120
+                                x: popupVolumeSlider.leftPadding + popupVolumeSlider.availableWidth / 2 - 2
+                                y: popupVolumeSlider.topPadding
+                                width: 4; height: popupVolumeSlider.availableHeight; radius: 2
+                                color: Qt.rgba(root.cBorder.r, root.cBorder.g, root.cBorder.b, 0.6)
+                                Rectangle {
+                                    // 已选区域：从底部到 handle（Windows 音量条风格：handle 下方为已选区域）
+                                    // 用 value 计算：value=0 时 y=height height=0（空），value=1 时 y=0 height=满（整条）
+                                    y: (1 - popupVolumeSlider.value) * parent.height
+                                    height: popupVolumeSlider.value * parent.height
+                                    width: parent.width; radius: 2
+                                    color: root.cAccent
+                                }
+                            }
+                            handle: Rectangle {
+                                x: popupVolumeSlider.leftPadding + popupVolumeSlider.availableWidth / 2 - width / 2
+                                // 用 value 计算：value=0 时 y 在底部，value=1 时 y 在顶部
+                                y: popupVolumeSlider.topPadding + (1 - popupVolumeSlider.value) * (popupVolumeSlider.availableHeight - height)
+                                width: 16; height: 16; radius: 8
+                                color: popupVolumeSlider.pressed ? Qt.lighter(root.cAccent, 1.2) : root.cAccent
+                                border.color: "#ffffff"; border.width: 2
+                                Behavior on color { ColorAnimation { duration: 100 } }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -1257,6 +1511,14 @@ Window {
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
+
+        // 已选 TAG 列表（tagDialog 保存时写回此属性，Flow+Repeater 自动刷新显示）
+        property var selectedTags: []
+        property string startDateValue: ""
+        property string finishDateValue: ""
+        // 关闭对话框时清空已选 TAG 和表单（避免下次打开残留上次选择）
+        onClosing: { selectedTags = []; nameField.text = ""; notesField.text = ""; addCoverPath.text = ""; startDateValue = ""; finishDateValue = ""; addStartDateBtn.text = tt("selectDate"); addFinishDateBtn.text = tt("selectDate") }
+
         Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
         FramelessDragBar { dialogWindow: addDialog }
         Flickable {
@@ -1265,13 +1527,72 @@ Window {
             ScrollBar.vertical: MainSB {}
             ColumnLayout { id: addCol; width: parent.width; spacing: 10
                 TextField { id: nameField; Layout.fillWidth: true; placeholderText: tt("name"); background: InputBg {} }
-                TextField { id: typeField; Layout.fillWidth: true; placeholderText: tt("type"); background: InputBg {} }
+                // 游戏 TAG 区域（可视化按钮 + 选 TAG 按钮）
+                ColumnLayout { Layout.fillWidth: true; spacing: 6
+                    // 已选 TAG 按钮列表（Flow 自动换行，每个 tag 是圆角小按钮带 ✕ 删除）
+                    Flow {
+                        id: addTagFlow; Layout.fillWidth: true; spacing: 6
+                        visible: addDialog.selectedTags.length > 0
+                        Repeater {
+                            model: addDialog.selectedTags
+                            delegate: Rectangle {
+                                width: addTagText.implicitWidth + 28; height: 24; radius: 12
+                                color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.15)
+                                border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1
+                                Text { id: addTagText; anchors.left: parent.left; anchors.leftMargin: 8; anchors.verticalCenter: parent.verticalCenter; text: modelData; color: cAccent; font.pixelSize: 11 }
+                                // ✕ 删除按钮（直接在添加页删除 tag，无需打开 tagDialog）
+                                Rectangle {
+                                    anchors.right: parent.right; anchors.rightMargin: 4; anchors.verticalCenter: parent.verticalCenter
+                                    width: 14; height: 14; radius: 7
+                                    color: addTagDelMA.containsMouse ? "#ff4444" : "transparent"
+                                    border.color: addTagDelMA.containsMouse ? "#ff4444" : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1
+                                    Text { anchors.centerIn: parent; text: "✕"; color: addTagDelMA.containsMouse ? "#ffffff" : cAccent; font.pixelSize: 8 }
+                                    MouseArea { id: addTagDelMA; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { var l = addDialog.selectedTags.slice(); l.splice(index, 1); addDialog.selectedTags = l } }
+                                }
+                            }
+                        }
+                    }
+                    // 空占位提示（无 tag 时）+ 选 TAG 按钮
+                    Row { Layout.fillWidth: true; spacing: 6
+                        Label {
+                            text: addDialog.selectedTags.length === 0 ? tt("noTagHint") : ""
+                            color: cSub; font.pixelSize: 11
+                            verticalAlignment: Text.AlignVCenter
+                            visible: addDialog.selectedTags.length === 0
+                            Layout.fillWidth: true
+                        }
+                        Button {
+                            id: addSelectTagBtn
+                            text: "+ " + tt("selectTag"); flat: true; implicitHeight: 28; implicitWidth: 90
+                            background: Rectangle {
+                                color: addSelectTagBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.2)
+                                radius: 4; border.color: cAccent; border.width: 1
+                                Behavior on color { ColorAnimation { duration: 150 } }
+                            }
+                            palette.buttonText: addSelectTagBtn.hovered ? "#ffffff" : cAccent; font.pixelSize: 11
+                            onClicked: tagDialog.openWith(addDialog)
+                        }
+                    }
+                }
                 Row { Layout.fillWidth: true; spacing: 4; Label { text: tt("rating"); anchors.verticalCenter: parent.verticalCenter; color: cSub } StarInput { id: ratingField } }
                 ComboBox { id: statusField; Layout.fillWidth: true; model: root.currentLang.length >= 0 ? [tt("todo"), tt("playing"), tt("done")] : []; background: InputBg {} }
-                Row { Layout.fillWidth: true; spacing: 8
-                    Label { text: tt("playTime"); anchors.verticalCenter: parent.verticalCenter; color: cSub; font.pixelSize: 13 }
-                    TextField { id: playTimeField; width: 80; placeholderText: "0"; background: InputBg {} }
-                    Label { text: tt("hours"); anchors.verticalCenter: parent.verticalCenter; color: cSub; font.pixelSize: 13 }
+                ColumnLayout { Layout.fillWidth: true; spacing: 6
+                    Label { text: tt("playDate"); color: cSub; font.pixelSize: 13 }
+                    Row { Layout.fillWidth: true; spacing: 8
+                        Button {
+                            id: addStartDateBtn; text: tt("selectDate"); flat: true; implicitHeight: 30; implicitWidth: 120
+                            background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.1); radius: 4; border.color: cBorder; border.width: 1 }
+                            palette.buttonText: cText; font.pixelSize: 12
+                            onClicked: dateSelector.openWith("addStart", addDialog.startDateValue)
+                        }
+                        Label { text: tt("toDate"); anchors.verticalCenter: parent.verticalCenter; color: cSub; font.pixelSize: 13 }
+                        Button {
+                            id: addFinishDateBtn; text: tt("selectDate"); flat: true; implicitHeight: 30; implicitWidth: 120
+                            background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.1); radius: 4; border.color: cBorder; border.width: 1 }
+                            palette.buttonText: cText; font.pixelSize: 12
+                            onClicked: dateSelector.openWith("addFinish", addDialog.finishDateValue)
+                        }
+                    }
                 }
                 Row { Layout.fillWidth: true; spacing: 8
                     BtnGhost { text: tt("selectCover"); onClicked: addCoverDialog.open() }
@@ -1284,15 +1605,13 @@ Window {
                     background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.75); radius: 8; implicitWidth: 80; implicitHeight: 34 }
                     onClicked: {
                         if (nameField.text.trim() === "") { warn(tt("warnName")); return; }
-                        var types = typeField.text.split(/\s+/).map(function(s){return s.trim();}).filter(function(s){return s.length>0});
+                        // 直接读取 addDialog.selectedTags 数组（无需解析字符串）
+                        var types = addDialog.selectedTags.slice()
                         if (types.length === 0) { warn(tt("warnType")); return; }
                         var r = parseFloat(ratingField.field.text);
                         if (isNaN(r) || r < 0 || r > 10) { warn(tt("warnRating")); return; }
-                        var pt = parseInt(playTimeField.text);
-                        if (isNaN(pt) || pt < 0) pt = 0;
-                        dbManager.addGame(nameField.text, types, r, root.statusKeys[statusField.currentIndex], pt, "", "", notesField.text, addCoverPath.text);
-                        nameField.text=""; typeField.text=""; playTimeField.text=""; notesField.text=""; addCoverPath.text="";
-                        reloadList(); refreshStats(); addDialog.close();
+                        dbManager.addGame(nameField.text, types, r, root.statusKeys[statusField.currentIndex], 0, addDialog.startDateValue, addDialog.finishDateValue, notesField.text, addCoverPath.text);
+                        reloadList(); refreshStats(); addDialog.close();   // onClosing 会自动清空 selectedTags 和表单
                     }
                 }
             }
@@ -1313,6 +1632,21 @@ Window {
         x: root.x + (root.width - width) / 2
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
+
+        // 已选 TAG 列表（tagDialog 保存时写回此属性，Flow+Repeater 自动刷新显示）
+        property var selectedTags: []
+        property string startDateValue: ""
+        property string finishDateValue: ""
+        // 编辑窗打开时从详情窗初始化日期值与按钮显示
+        onVisibleChanged: {
+            if (visible) {
+                startDateValue = gameDetailDialog.detailGameStartDate
+                finishDateValue = gameDetailDialog.detailGameFinishDate
+                editStartDateBtn.text = startDateValue.length > 0 ? root.formatDate(startDateValue) : root.tt("selectDate")
+                editFinishDateBtn.text = finishDateValue.length > 0 ? root.formatDate(finishDateValue) : root.tt("selectDate")
+            }
+        }
+
         Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
         FramelessDragBar { dialogWindow: editDialog }
         Flickable {
@@ -1321,13 +1655,72 @@ Window {
             ScrollBar.vertical: MainSB {}
             ColumnLayout { id: editCol; width: parent.width; spacing: 10
                 TextField { id: editNameField; Layout.fillWidth: true; placeholderText: tt("name"); background: InputBg {} }
-                TextField { id: editTypeField; Layout.fillWidth: true; placeholderText: tt("type"); background: InputBg {} }
+                // 游戏 TAG 区域（可视化按钮 + 选 TAG 按钮）
+                ColumnLayout { Layout.fillWidth: true; spacing: 6
+                    // 已选 TAG 按钮列表（Flow 自动换行，每个 tag 是圆角小按钮带 ✕ 删除）
+                    Flow {
+                        id: editTagFlow; Layout.fillWidth: true; spacing: 6
+                        visible: editDialog.selectedTags.length > 0
+                        Repeater {
+                            model: editDialog.selectedTags
+                            delegate: Rectangle {
+                                width: editTagText.implicitWidth + 28; height: 24; radius: 12
+                                color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.15)
+                                border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1
+                                Text { id: editTagText; anchors.left: parent.left; anchors.leftMargin: 8; anchors.verticalCenter: parent.verticalCenter; text: modelData; color: cAccent; font.pixelSize: 11 }
+                                // ✕ 删除按钮（直接在编辑页删除 tag，无需打开 tagDialog）
+                                Rectangle {
+                                    anchors.right: parent.right; anchors.rightMargin: 4; anchors.verticalCenter: parent.verticalCenter
+                                    width: 14; height: 14; radius: 7
+                                    color: editTagDelMA.containsMouse ? "#ff4444" : "transparent"
+                                    border.color: editTagDelMA.containsMouse ? "#ff4444" : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.4); border.width: 1
+                                    Text { anchors.centerIn: parent; text: "✕"; color: editTagDelMA.containsMouse ? "#ffffff" : cAccent; font.pixelSize: 8 }
+                                    MouseArea { id: editTagDelMA; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { var l = editDialog.selectedTags.slice(); l.splice(index, 1); editDialog.selectedTags = l } }
+                                }
+                            }
+                        }
+                    }
+                    // 空占位提示（无 tag 时）+ 选 TAG 按钮
+                    Row { Layout.fillWidth: true; spacing: 6
+                        Label {
+                            text: editDialog.selectedTags.length === 0 ? tt("noTagHint") : ""
+                            color: cSub; font.pixelSize: 11
+                            verticalAlignment: Text.AlignVCenter
+                            visible: editDialog.selectedTags.length === 0
+                            Layout.fillWidth: true
+                        }
+                        Button {
+                            id: editSelectTagBtn
+                            text: "+ " + tt("selectTag"); flat: true; implicitHeight: 28; implicitWidth: 90
+                            background: Rectangle {
+                                color: editSelectTagBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.2)
+                                radius: 4; border.color: cAccent; border.width: 1
+                                Behavior on color { ColorAnimation { duration: 150 } }
+                            }
+                            palette.buttonText: editSelectTagBtn.hovered ? "#ffffff" : cAccent; font.pixelSize: 11
+                            onClicked: tagDialog.openWith(editDialog)
+                        }
+                    }
+                }
                 Row { Layout.fillWidth: true; spacing: 4; Label { text: tt("rating"); anchors.verticalCenter: parent.verticalCenter; color: cSub } StarInput { id: editRatingField } }
                 ComboBox { id: editStatusField; Layout.fillWidth: true; model: root.currentLang.length >= 0 ? [tt("todo"), tt("playing"), tt("done")] : []; background: InputBg {} }
-                Row { Layout.fillWidth: true; spacing: 8
-                    Label { text: tt("playTime"); anchors.verticalCenter: parent.verticalCenter; color: cSub; font.pixelSize: 13 }
-                    TextField { id: editPlayTimeField; width: 80; placeholderText: "0"; background: InputBg {} }
-                    Label { text: tt("hours"); anchors.verticalCenter: parent.verticalCenter; color: cSub; font.pixelSize: 13 }
+                ColumnLayout { Layout.fillWidth: true; spacing: 6
+                    Label { text: tt("playDate"); color: cSub; font.pixelSize: 13 }
+                    Row { Layout.fillWidth: true; spacing: 8
+                        Button {
+                            id: editStartDateBtn; text: tt("selectDate"); flat: true; implicitHeight: 30; implicitWidth: 120
+                            background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.1); radius: 4; border.color: cBorder; border.width: 1 }
+                            palette.buttonText: cText; font.pixelSize: 12
+                            onClicked: dateSelector.openWith("editStart", editDialog.startDateValue)
+                        }
+                        Label { text: tt("toDate"); anchors.verticalCenter: parent.verticalCenter; color: cSub; font.pixelSize: 13 }
+                        Button {
+                            id: editFinishDateBtn; text: tt("selectDate"); flat: true; implicitHeight: 30; implicitWidth: 120
+                            background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.1); radius: 4; border.color: cBorder; border.width: 1 }
+                            palette.buttonText: cText; font.pixelSize: 12
+                            onClicked: dateSelector.openWith("editFinish", editDialog.finishDateValue)
+                        }
+                    }
                 }
                 Row { Layout.fillWidth: true; spacing: 8
                     BtnGhost { text: tt("selectCover"); onClicked: editCoverDialog.open() }
@@ -1338,19 +1731,20 @@ Window {
                 TextArea { id: editNotesField; Layout.fillWidth: true; placeholderText: tt("notes"); wrapMode: TextArea.Wrap; height: 80; font.pixelSize: 13; background: InputBg {} }
                 BtnSave { Layout.alignment: Qt.AlignHCenter; onClicked: {
                     if (editNameField.text.trim() === "") { warn(tt("warnName")); return; }
-                    var types = editTypeField.text.split(/\s+/).map(function(s){return s.trim();}).filter(function(s){return s.length>0});
+                    // 直接读取 editDialog.selectedTags 数组（无需解析字符串）
+                    var types = editDialog.selectedTags.slice()
                     if (types.length === 0) { warn(tt("warnType")); return; }
                     var r = parseFloat(editRatingField.field.text);
                     if (isNaN(r) || r < 0 || r > 10) { warn(tt("warnRating")); return; }
-                    var pt = parseInt(editPlayTimeField.text);
-                    if (isNaN(pt) || pt < 0) pt = 0;
-                    dbManager.updateGame(editDialog.gameId, editNameField.text, types, r, root.statusKeys[editStatusField.currentIndex], pt, "", "", editNotesField.text, editCoverPath.text);
+                    dbManager.updateGame(editDialog.gameId, editNameField.text, types, r, root.statusKeys[editStatusField.currentIndex], 0, editDialog.startDateValue, editDialog.finishDateValue, editNotesField.text, editCoverPath.text);
                     // 更新详情窗的数据并返回详情窗（detailGameTypes 已改为 var 数组，直接赋值）
                     gameDetailDialog.detailGameName = editNameField.text;
                     gameDetailDialog.detailGameTypes = types;
+                    gameDetailDialog.selectedTags = types.slice();   // 同步 selectedTags（保证 tagDialog 下次打开时读取最新值）
                     gameDetailDialog.detailGameRating = r;
                     gameDetailDialog.detailGameStatus = root.statusKeys[editStatusField.currentIndex];
-                    gameDetailDialog.detailGamePlayTime = pt;
+                    gameDetailDialog.detailGameStartDate = editDialog.startDateValue;
+                    gameDetailDialog.detailGameFinishDate = editDialog.finishDateValue;
                     gameDetailDialog.detailGameNotes = editNotesField.text;
                     gameDetailDialog.detailGameCover = editCoverPath.text;
                     editDialog.close(); reloadList(); refreshStats();
@@ -1422,21 +1816,22 @@ Window {
         property string detailGameName: ""
         property string detailGameCover: ""
         property var detailGameTypes: []
+        // selectedTags 用于 tagDialog 交互（与 detailGameTypes 双向同步：openWith 初始化、onTagsSaved 写回）
+        property var selectedTags: []
         property double detailGameRating: 0
         property string detailGameStatus: ""
-        property int detailGamePlayTime: 0
+        property string detailGameStartDate: ""
+        property string detailGameFinishDate: ""
         property string detailGameNotes: ""
         // 内联编辑状态（同时只能编辑一处）
         property bool editingName: false
         property bool editingNotes: false
-        property bool editingPlayTime: false
         property bool editingRating: false
 
         // 互斥：开启新编辑前自动保存上一次编辑
         function commitCurrentEdit() {
             if (editingName) saveInlineName(nameEditField.text);
             if (editingNotes) saveInlineNotes(notesEditArea.text);
-            if (editingPlayTime) saveInlinePlayTime(playTimeEditField.text);
             if (editingRating) saveInlineRating(ratingEditField.text);
         }
         function startEditName() {
@@ -1451,20 +1846,13 @@ Window {
             editingNotes = true;
             notesEditArea.forceActiveFocus();
         }
-        function startEditPlayTime() {
-            commitCurrentEdit();
-            playTimeEditField.text = String(detailGamePlayTime);
-            editingPlayTime = true;
-            playTimeEditField.forceActiveFocus();
-            playTimeEditField.selectAll();
-        }
 
         // 保存内联编辑的名称
         function saveInlineName(newName) {
             if (newName.trim().length === 0) { editingName = false; return }
             dbManager.updateGame(detailGameId, newName.trim(), detailGameTypes,
-                detailGameRating, detailGameStatus, detailGamePlayTime,
-                "", "", detailGameNotes, detailGameCover);
+                detailGameRating, detailGameStatus, 0,
+                detailGameStartDate, detailGameFinishDate, detailGameNotes, detailGameCover);
             detailGameName = newName.trim();
             editingName = false;
             gameListModel.refresh(searchField.text);
@@ -1476,8 +1864,8 @@ Window {
             r = Math.max(0, Math.min(10, Math.round(r * 10) / 10));   // 限制 0.0-10.0，保留 1 位小数
             if (r !== detailGameRating) {
                 dbManager.updateGame(detailGameId, detailGameName, detailGameTypes,
-                    r, detailGameStatus, detailGamePlayTime,
-                    "", "", detailGameNotes, detailGameCover);
+                    r, detailGameStatus, 0,
+                    detailGameStartDate, detailGameFinishDate, detailGameNotes, detailGameCover);
                 detailGameRating = r;
                 gameListModel.refresh(searchField.text);
             }
@@ -1494,10 +1882,16 @@ Window {
         function saveInlineTypes(newTypesArr) {
             commitCurrentEdit();
             dbManager.updateGame(detailGameId, detailGameName, newTypesArr,
-                detailGameRating, detailGameStatus, detailGamePlayTime,
-                "", "", detailGameNotes, detailGameCover);
+                detailGameRating, detailGameStatus, 0,
+                detailGameStartDate, detailGameFinishDate, detailGameNotes, detailGameCover);
             detailGameTypes = newTypesArr;
+            // 同步 selectedTags（保证 detailGameTypes 与 selectedTags 始终一致，避免 tagDialog 读取旧值）
+            selectedTags = newTypesArr.slice()
             gameListModel.refresh(searchField.text);
+        }
+        // tagDialog 保存回调：与 saveInlineTypes 等价（接受 tag 数组，同步 detailGameTypes + selectedTags + 持久化数据库 + 刷新列表）
+        function onTagsSaved(tags) {
+            saveInlineTypes(tags)
         }
         // 切换游戏状态（待玩→进行中→已完成→待玩）
         function cycleStatus() {
@@ -1506,8 +1900,8 @@ Window {
             var idx = statuses.indexOf(detailGameStatus);
             var next = statuses[(idx + 1) % 3];
             dbManager.updateGame(detailGameId, detailGameName, detailGameTypes,
-                detailGameRating, next, detailGamePlayTime,
-                "", "", detailGameNotes, detailGameCover);
+                detailGameRating, next, 0,
+                detailGameStartDate, detailGameFinishDate, detailGameNotes, detailGameCover);
             detailGameStatus = next;
             gameListModel.refresh(searchField.text);
             root.refreshStats();   // 状态改变后重新统计（待玩/进行中/已完成数量）
@@ -1515,21 +1909,10 @@ Window {
         // 保存内联编辑的评价
         function saveInlineNotes(newNotes) {
             dbManager.updateGame(detailGameId, detailGameName, detailGameTypes,
-                detailGameRating, detailGameStatus, detailGamePlayTime,
-                "", "", newNotes, detailGameCover);
+                detailGameRating, detailGameStatus, 0,
+                detailGameStartDate, detailGameFinishDate, newNotes, detailGameCover);
             detailGameNotes = newNotes;
             editingNotes = false;
-        }
-        // 保存内联编辑的游玩时长（小时，整数）
-        function saveInlinePlayTime(newVal) {
-            var pt = parseInt(newVal);
-            if (isNaN(pt) || pt < 0) pt = 0;
-            dbManager.updateGame(detailGameId, detailGameName, detailGameTypes,
-                detailGameRating, detailGameStatus, pt,
-                "", "", detailGameNotes, detailGameCover);
-            detailGamePlayTime = pt;
-            editingPlayTime = false;
-            gameListModel.refresh(searchField.text);
         }
         // 更换封面（从文件选择→裁剪→保存）
         function changeCover() {
@@ -1548,11 +1931,13 @@ Window {
             ssFade = s.fade !== undefined ? s.fade : 800;
         }
 
-        function openWith(id, name, cover, types, rating, status, playTime, notes) {
+        function openWith(id, name, cover, types, rating, status, startDate, finishDate, notes) {
             detailGameId = id; detailGameName = name; detailGameCover = cover;
             try { detailGameTypes = JSON.parse(types) } catch(e) { detailGameTypes = [] }
+            // 同步 selectedTags 用于 tagDialog 交互
+            selectedTags = detailGameTypes.slice()
             detailGameRating = rating; detailGameStatus = status;
-            detailGamePlayTime = playTime; detailGameNotes = notes;
+            detailGameStartDate = startDate; detailGameFinishDate = finishDate; detailGameNotes = notes;
             screenshots = dbManager.getScreenshots(id);
             loadScreenshotSettings();
             show();
@@ -1600,9 +1985,6 @@ Window {
                 }
             }
         }
-
-        onClosing: {}
-        onVisibleChanged: {}
 
         Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
         FramelessDragBar { dialogWindow: gameDetailDialog }
@@ -1661,7 +2043,7 @@ Window {
                         MouseArea {
                             anchors.fill: parent
                             propagateComposedEvents: true
-                            enabled: gameDetailDialog.editingName || gameDetailDialog.editingPlayTime || gameDetailDialog.editingRating
+                            enabled: gameDetailDialog.editingName || gameDetailDialog.editingRating
                             visible: enabled
                             onPressed: {
                                 gameDetailDialog.commitCurrentEdit();
@@ -1763,38 +2145,42 @@ Window {
                                     elide: Text.ElideRight; width: Math.min(implicitWidth + 2, 120)
                                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: gameDetailDialog.cycleStatus() }
                                 }
-                                // 游玩时长（状态后，点击进入内联编辑）
-                                Text {
-                                    visible: !gameDetailDialog.editingPlayTime
-                                    text: "⏱ " + gameDetailDialog.detailGamePlayTime + "h"; color: root.cSub; font.pixelSize: 14; height: 20; verticalAlignment: Text.AlignVCenter
-                                    MouseArea { id: playTimeHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: gameDetailDialog.startEditPlayTime() }
-                                    ToolTip.text: root.tt("clickToEdit"); ToolTip.visible: playTimeHover.containsMouse
-                                }
-                                TextField {
-                                    id: playTimeEditField
-                                    visible: gameDetailDialog.editingPlayTime
-                                    width: 70; font.pixelSize: 13; height: 20
-                                    placeholderText: "h"; selectByMouse: true
-                                    onAccepted: gameDetailDialog.saveInlinePlayTime(text)
-                                    onActiveFocusChanged: if (!activeFocus && gameDetailDialog.editingPlayTime) gameDetailDialog.saveInlinePlayTime(text)
-                                    background: Rectangle { color: root.cInput; radius: 3; border.color: root.cAccent; border.width: 1 }
-                                    palette.text: root.cText; palette.placeholderText: root.cSub
-                                    onTextChanged: {
-                                        // 只允许数字
-                                        var t = text.replace(/[^0-9]/g, "");
-                                        if (t !== text) text = t;
-                                        if (text.length > 5) text = text.substring(0, 5);
+                                // 游玩日期显示（点击进入日历选择器编辑：开始日期/结束日期分别可改）
+                                Item {
+                                    height: 20; width: dateRow.implicitWidth
+                                    Row {
+                                        id: dateRow
+                                        spacing: 4; height: parent.height
+                                        // 开始日期（点击编辑）
+                                        Text {
+                                            text: (gameDetailDialog.detailGameStartDate.length > 0)
+                                                ? "📅 " + root.formatDate(gameDetailDialog.detailGameStartDate)
+                                                : "📅 " + root.tt("selectDate")
+                                            color: gameDetailDialog.detailGameStartDate.length > 0 ? root.cAccent : root.cSub
+                                            font.pixelSize: 14; height: parent.height; verticalAlignment: Text.AlignVCenter
+                                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: dateSelector.openWith("detailStart", gameDetailDialog.detailGameStartDate) }
+                                        }
+                                        Text { text: root.tt("toDate"); color: root.cSub; font.pixelSize: 14; height: parent.height; verticalAlignment: Text.AlignVCenter }
+                                        // 结束日期（点击编辑）
+                                        Text {
+                                            text: (gameDetailDialog.detailGameFinishDate.length > 0)
+                                                ? root.formatDate(gameDetailDialog.detailGameFinishDate)
+                                                : root.tt("selectDate")
+                                            color: gameDetailDialog.detailGameFinishDate.length > 0 ? root.cAccent : root.cSub
+                                            font.pixelSize: 14; height: parent.height; verticalAlignment: Text.AlignVCenter
+                                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: dateSelector.openWith("detailFinish", gameDetailDialog.detailGameFinishDate) }
+                                        }
                                     }
                                 }
                             }
 
-                            // 游戏类型标签（横向显示，每行最多5个，超出自动换行；点击编辑）
+                            // 游戏 TAG 显示区域（每行5个，超出自动换行；纯显示，通过右侧"选 TAG"按钮修改）
                             Item {
                                 width: parent.width
                                 height: gameDetailDialog.detailGameTypes.length === 0 ? 28 : Math.max(28, typeTagGrid.contentHeight + 8)
                                 GridView {
                                     id: typeTagGrid
-                                    width: parent.width
+                                    width: parent.width - 90   // 右侧预留 90px 给"选 TAG"按钮
                                     height: contentHeight
                                     anchors.left: parent.left; anchors.top: parent.top; anchors.topMargin: 4
                                     cellWidth: Math.max(60, width / 5)
@@ -1810,8 +2196,25 @@ Window {
                                         Text { anchors.centerIn: parent; text: String(modelData).length > 10 ? String(modelData).substring(0, 10) + "…" : modelData; color: root.cAccent; font.pixelSize: 11 }
                                     }
                                 }
-                                Text { text: "✎ " + root.tt("clickToEdit"); color: root.cSub; font.pixelSize: 10; anchors.left: parent.left; anchors.top: parent.top; anchors.topMargin: 6; visible: gameDetailDialog.detailGameTypes.length === 0 }
-                                MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { gameDetailDialog.commitCurrentEdit(); typeEditDialog.openWith(gameDetailDialog.detailGameTypes) } }
+                                // 空占位提示（无 tag 时显示，引导用户点击右侧"选 TAG"按钮）
+                                Text { text: root.tt("noTagHint"); color: root.cSub; font.pixelSize: 10; anchors.left: parent.left; anchors.top: parent.top; anchors.topMargin: 6; width: parent.width - 90; elide: Text.ElideRight; visible: gameDetailDialog.detailGameTypes.length === 0 }
+                                // "选 TAG" 按钮（打开 tagDialog 可视化选择，详情页通过 onTagsSaved 回调持久化数据库）
+                                Button {
+                                    id: detailSelectTagBtn
+                                    anchors.right: parent.right; anchors.top: parent.top; anchors.topMargin: 2
+                                    text: "+ " + root.tt("selectTag"); flat: true; implicitHeight: 26; implicitWidth: 90
+                                    background: Rectangle {
+                                        color: detailSelectTagBtn.hovered ? root.cAccent : Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.2)
+                                        radius: 4; border.color: root.cAccent; border.width: 1
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+                                    palette.buttonText: detailSelectTagBtn.hovered ? "#ffffff" : root.cAccent; font.pixelSize: 11
+                                    onClicked: {
+                                        gameDetailDialog.commitCurrentEdit()
+                                        // 打开 tagDialog，从 gameDetailDialog.selectedTags 初始化
+                                        tagDialog.openWith(gameDetailDialog)
+                                    }
+                                }
                             }
 
                             // 分割线
@@ -1940,8 +2343,6 @@ Window {
                             Row {
                                 width: parent.width; spacing: 6
                                 Text { text: "📝 " + root.tt("gameNotes"); color: root.cText; font.bold: true; font.pixelSize: 14; topPadding: 4; anchors.verticalCenter: parent.verticalCenter }
-                                Item { width: parent.width - 200; height: 1 }
-                                Text { text: "✎ " + root.tt("clickToEdit"); color: root.cSub; font.pixelSize: 10; anchors.verticalCenter: parent.verticalCenter; visible: !gameDetailDialog.editingNotes }
                             }
                             // 显示模式
                             Rectangle {
@@ -2469,164 +2870,463 @@ Window {
         onAccepted: { cropDialog.openCoverForDetail(urlToPath(currentFile)) }
     }
 
-    // 详情窗类型编辑对话框（列表式：每行可编辑+删除）
+    // ===== 游戏 TAG 选择对话框（独立 Window，上块系统默认+搜索栏，下块用户自定义+加号添加+删除）=====
+    // 多父对话框支持：openWith(dialog) 传入调用方对话框（addDialog/editDialog/gameDetailDialog）
+    // 保存时写回 dialog.selectedTags，并调用 dialog.onTagsSaved 回调（若有，详情页用于持久化数据库）
     Window {
-        id: typeEditDialog
-        transientParent: gameDetailDialog
+        id: tagDialog
         flags: Qt.FramelessWindowHint | Qt.Window
         color: "transparent"
-        width: 360; height: 340
-        title: tt("editType")
+        title: tt("tagTitle")
+        width: 600; height: 560
+        minimumWidth: 560; minimumHeight: 520
+        // x/y 动态跟随父对话框居中（在 openWith 中根据 targetDialog 计算）
+        palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
 
-        // 居中于父窗口
-        x: gameDetailDialog.x + Math.max(24, (gameDetailDialog.width - width) / 2)
-        y: gameDetailDialog.y + Math.max(24, (gameDetailDialog.height - height) / 2)
+        property var targetDialog: null     // 调用方对话框（addDialog/editDialog/gameDetailDialog），用于读写 selectedTags 和 transientParent
+        property var selectedTags: []       // 当前已选 TAG 列表（本地副本，保存时写回 targetDialog.selectedTags）
+        property string searchKey: ""       // 系统默认类型搜索关键词
 
-        property var typeList: []
-        property int editingTypeIdx: -1
-        function openWith(typesArr) {
-            typeList = (typesArr && typesArr.slice) ? typesArr.slice() : []
-            editingTypeIdx = -1
-            typeAddField.text = ""
+        function openWith(dialog) {
+            targetDialog = dialog
+            // 设置 transientParent 实现层级关系（tagDialog 跟随父对话框）
+            if (dialog) {
+                transientParent = dialog
+                // 居中于父对话框
+                x = dialog.x + Math.max(24, (dialog.width - width) / 2)
+                y = dialog.y + Math.max(24, (dialog.height - height) / 2)
+                // 从 dialog.selectedTags 初始化本地副本（统一接口：所有调用方都有 selectedTags 属性）
+                var src = dialog.selectedTags || []
+                selectedTags = src.slice()
+            } else {
+                transientParent = root
+                x = root.x + (root.width - width) / 2
+                y = root.y + (root.height - height) / 2
+                selectedTags = []
+            }
+            searchKey = ""
+            tagInputField.text = ""
             show()
         }
-        onVisibleChanged: {
-            if (!visible && gameDetailDialog.visible) gameDetailDialog.requestActivate()
+        function toggleTag(tag) {
+            var idx = selectedTags.indexOf(tag)
+            var l = selectedTags.slice()
+            if (idx < 0) l.push(tag)
+            else l.splice(idx, 1)
+            selectedTags = l
         }
+        function addCustomTag() {
+            var t = tagInputField.text.trim()
+            if (t.length === 0) return
+            // 检查与系统默认或已有自定义重复（用户要求"与系统内置一样则无法添加并提示"）
+            if (root.systemTags.indexOf(t) >= 0 || root.customTags.indexOf(t) >= 0) {
+                warn(tt("tagExists"))
+                return
+            }
+            var l = root.customTags.slice()
+            l.push(t)
+            root.customTags = l
+            dbManager.setSetting("customTags", JSON.stringify(l))   // 持久化
+            tagInputField.text = ""
+            toggleTag(t)   // 自动选中新添加的 tag
+        }
+        function removeCustomTag(tag) {
+            var l = root.customTags.slice()
+            var idx = l.indexOf(tag)
+            if (idx >= 0) l.splice(idx, 1)
+            root.customTags = l
+            dbManager.setSetting("customTags", JSON.stringify(l))   // 持久化
+            var sidx = selectedTags.indexOf(tag)
+            if (sidx >= 0) {
+                var sl = selectedTags.slice()
+                sl.splice(sidx, 1)
+                selectedTags = sl
+            }
+        }
+        function saveTags() {
+            // 写回 targetDialog.selectedTags（触发对话框内 Flow+Repeater 刷新）
+            if (targetDialog) {
+                targetDialog.selectedTags = selectedTags.slice()
+            }
+            // 若调用方有 onTagsSaved 回调（如详情页需要同步 detailGameTypes + 持久化数据库），则调用
+            if (targetDialog && targetDialog.onTagsSaved) {
+                targetDialog.onTagsSaved(selectedTags.slice())
+            }
+            hide()
+        }
+
         Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
-        FramelessDragBar { dialogWindow: typeEditDialog }
-        Column {
-            anchors.fill: parent; anchors.margins: 12; anchors.topMargin: 38; spacing: 10
+        FramelessDragBar { dialogWindow: tagDialog }
+        // 内容区（Flickable 包裹，内容超出时可滚动，不会遮挡底部按钮）
+        Flickable {
+            anchors.fill: parent; anchors.margins: 12
+            anchors.topMargin: 38; anchors.bottomMargin: 50   // 底部预留 50px 给固定按钮栏
+            clip: true; contentWidth: width; contentHeight: tagContentCol.implicitHeight
+            boundsBehavior: Flickable.StopAtBounds
+            ScrollBar.vertical: MainSB {}
+            Column {
+                id: tagContentCol
+                width: parent.width; spacing: 8
 
-            // 标题
-            Text { text: tt("currentTypes"); color: cSub; font.pixelSize: 11 }
+                // 标题
+                Text { text: tt("tagTitle"); color: cText; font.bold: true; font.pixelSize: 14 }
 
-            // 类型列表（可编辑+删除）
-            ListView {
-                id: typeListView
-                width: parent.width; height: 160; clip: true; spacing: 6
-                model: typeEditDialog.typeList
-                boundsBehavior: Flickable.StopAtBounds
-                ScrollBar.vertical: MainSB {}
-
-                delegate: Rectangle {
-                    width: typeListView.width; height: 34; radius: 6
-                    color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.08); border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.3); border.width: 1
-
-                    Row {
-                        anchors.fill: parent; anchors.margins: 4; spacing: 6
-
-                        // 序号
-                        Text { text: (index + 1) + "."; color: cSub; font.pixelSize: 11; width: 18; anchors.verticalCenter: parent.verticalCenter; horizontalAlignment: Text.AlignRight }
-
-                        // 类型名（显示/编辑切换）
-                        Item {
-                            width: parent.width - 18 - 30 - 30 - 6*3; height: parent.height
-                            // 显示模式
-                            Text {
-                                anchors.fill: parent; anchors.leftMargin: 4
-                                visible: typeEditDialog.editingTypeIdx !== index
-                                text: modelData; color: cText; font.pixelSize: 12; verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                            }
-                            MouseArea {
-                                anchors.fill: parent; visible: typeEditDialog.editingTypeIdx !== index
-                                cursorShape: Qt.IBeamCursor
-                                onDoubleClicked: { typeEditField.text = modelData; typeEditDialog.editingTypeIdx = index; typeEditField.forceActiveFocus() }
-                            }
-                            // 编辑模式
-                            TextField {
-                                id: typeEditField
-                                anchors.fill: parent; visible: typeEditDialog.editingTypeIdx === index
-                                font.pixelSize: 12; color: cText; background: InputBg {}
-                                onAccepted: {
-                                    var t = text.trim();
-                                    if (t.length > 0) {
-                                        var l = typeEditDialog.typeList.slice();
-                                        l[index] = t;
-                                        typeEditDialog.typeList = l;
-                                    }
-                                    typeEditDialog.editingTypeIdx = -1;
-                                }
-                                Keys.onEscapePressed: typeEditDialog.editingTypeIdx = -1
-                            }
-                        }
-
-                        // 确认编辑按钮
-                        Button {
-                            text: "✓"; flat: true; implicitHeight: 26; implicitWidth: 30
-                            visible: typeEditDialog.editingTypeIdx === index
-                            background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.2); radius: 4; border.color: cAccent; border.width: 1 }
-                            palette.buttonText: cAccent; font.pixelSize: 12
-                            onClicked: {
-                                var t = typeEditField.text.trim();
-                                if (t.length > 0) {
-                                    var l = typeEditDialog.typeList.slice();
-                                    l[index] = t;
-                                    typeEditDialog.typeList = l;
-                                }
-                                typeEditDialog.editingTypeIdx = -1;
-                            }
-                        }
-
-                        // 删除按钮
-                        Button {
-                            text: "✕"; flat: true; implicitHeight: 26; implicitWidth: 30
-                            visible: typeEditDialog.editingTypeIdx !== index
-                            background: Rectangle { color: "#30ff4444"; radius: 4; border.color: "#ff4444"; border.width: 1 }
-                            palette.buttonText: "#ff4444"; font.pixelSize: 12
-                            onClicked: { var l = typeEditDialog.typeList.slice(); l.splice(index, 1); typeEditDialog.typeList = l }
-                        }
-                    }
-                }
-            }
-            Text { visible: typeEditDialog.typeList.length === 0; text: "—"; color: cSub; font.pixelSize: 12; anchors.horizontalCenter: parent.horizontalCenter }
-
-            // 分割线
-            Rectangle { width: parent.width; height: 1; color: Qt.rgba(cBorder.r, cBorder.g, cBorder.b, 0.5) }
-
-            // 添加新类型
-            Row {
-                width: parent.width; spacing: 6
+                // ===== 统一搜索/添加输入框（搜索过滤+未匹配时可添加为新 TAG）=====
                 TextField {
-                    id: typeAddField; width: parent.width - 70; font.pixelSize: 12; placeholderText: tt("typeOneHint")
+                    id: tagInputField
+                    width: parent.width; font.pixelSize: 12
+                    placeholderText: tt("tagSearch")
                     background: InputBg {}
-                    onTextChanged: if (text.length > 10) text = text.substring(0, 10)
+                    onTextChanged: tagDialog.searchKey = text.trim().toLowerCase()
                     onAccepted: {
-                        var t = text.trim();
-                        if (t.length > 0 && typeEditDialog.typeList.indexOf(t) < 0) {
-                            var l = typeEditDialog.typeList.slice(); l.push(t); typeEditDialog.typeList = l;
+                        // 回车：若输入内容未匹配现有 tag，则添加为新自定义 tag
+                        var txt = text.trim()
+                        if (txt.length === 0) return
+                        var all = root.systemTags.concat(root.customTags)
+                        var matched = false
+                        for (var i = 0; i < all.length; i++) {
+                            if (all[i].toLowerCase() === txt.toLowerCase()) { matched = true; break }
                         }
-                        text = "";
+                        if (!matched) tagDialog.addCustomTag()
                     }
                 }
+                // "+ 添加新 TAG：xxx" 按钮（输入内容未匹配现有 tag 时显示）
                 Button {
-                    text: "+ " + tt("add"); flat: true; implicitHeight: 32; implicitWidth: 64
-                    background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.2); radius: 4; border.color: cAccent; border.width: 1 }
-                    palette.buttonText: cAccent; font.pixelSize: 11
-                    onClicked: {
-                        var t = typeAddField.text.trim();
-                        if (t.length > 0 && typeEditDialog.typeList.indexOf(t) < 0) {
-                            var l = typeEditDialog.typeList.slice(); l.push(t); typeEditDialog.typeList = l;
+                    id: addNewTagBtn
+                    visible: {
+                        var txt = tagInputField.text.trim()
+                        if (txt.length === 0) return false
+                        var all = root.systemTags.concat(root.customTags)
+                        for (var i = 0; i < all.length; i++) {
+                            if (all[i].toLowerCase() === txt.toLowerCase()) return false
                         }
-                        typeAddField.text = "";
+                        return true
+                    }
+                    text: "+ " + tt("tagAdd") + "：" + tagInputField.text.trim()
+                    flat: true; implicitHeight: 28; width: parent.width
+                    background: Rectangle {
+                        color: addNewTagBtn.hovered ? cAccent : Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.15)
+                        radius: 4; border.color: cAccent; border.width: 1
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                    }
+                    palette.buttonText: addNewTagBtn.hovered ? "#ffffff" : cAccent; font.pixelSize: 11
+                    onClicked: tagDialog.addCustomTag()
+                }
+
+                // ===== 系统默认 TAG =====
+                Text { text: tt("tagSystem"); color: cSub; font.pixelSize: 12 }
+                // 系统默认 tag 列表（Flickable + Flow 自动换行，一行5个按钮式，hover 效果）
+                Flickable {
+                    width: parent.width; height: 160; clip: true
+                    contentWidth: width; contentHeight: systemTagFlow.height
+                    boundsBehavior: Flickable.StopAtBounds
+                    ScrollBar.vertical: MainSB {}
+                    Flow {
+                        id: systemTagFlow
+                        width: parent.width; spacing: 6
+                        Repeater {
+                            model: {
+                                var key = tagDialog.searchKey
+                                if (key.length === 0) return root.systemTags
+                                return root.systemTags.filter(function(t){return t.toLowerCase().indexOf(key) >= 0})
+                            }
+                            delegate: Rectangle {
+                                width: (systemTagFlow.width - 6*4) / 5; height: 30; radius: 6
+                                property bool isSelected: tagDialog.selectedTags.indexOf(modelData) >= 0
+                                property bool isHovered: sysTagMA.containsMouse
+                                color: isSelected ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.75) : (isHovered ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.18) : Qt.rgba(cCard.r, cCard.g, cCard.b, 0.7))
+                                border.color: isSelected ? cAccent : (isHovered ? cAccent : cBorder); border.width: 1
+                                Behavior on color { ColorAnimation { duration: 150 } }
+                                Behavior on border.color { ColorAnimation { duration: 150 } }
+                                Text { anchors.centerIn: parent; text: modelData; color: isSelected ? "#ffffff" : cText; font.pixelSize: 11 }
+                                MouseArea {
+                                    id: sysTagMA
+                                    anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                    onClicked: tagDialog.toggleTag(modelData)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 分割线
+                Rectangle { width: parent.width; height: 1; color: Qt.rgba(cBorder.r, cBorder.g, cBorder.b, 0.5) }
+
+                // ===== 用户自定义 TAG =====
+                Text { text: tt("tagCustom"); color: cSub; font.pixelSize: 12 }
+                // 用户自定义 tag 列表（每个右上角 ✕ 删除）
+                Flickable {
+                    width: parent.width; height: 100; clip: true
+                    contentWidth: width; contentHeight: customTagFlow.height
+                    boundsBehavior: Flickable.StopAtBounds
+                    ScrollBar.vertical: MainSB {}
+                    Flow {
+                        id: customTagFlow
+                        width: parent.width; spacing: 6
+                        Repeater {
+                            model: {
+                                // 自定义 tag 列表也受搜索关键词过滤
+                                var key = tagDialog.searchKey
+                                if (key.length === 0) return root.customTags
+                                return root.customTags.filter(function(t){return t.toLowerCase().indexOf(key) >= 0})
+                            }
+                            delegate: Rectangle {
+                                width: (customTagFlow.width - 6*4) / 5; height: 30; radius: 6
+                                property bool isSelected: tagDialog.selectedTags.indexOf(modelData) >= 0
+                                property bool isHovered: cusTagMA.containsMouse
+                                color: isSelected ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.75) : (isHovered ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.18) : Qt.rgba(cCard.r, cCard.g, cCard.b, 0.7))
+                                border.color: isSelected ? cAccent : (isHovered ? cAccent : cBorder); border.width: 1
+                                Behavior on color { ColorAnimation { duration: 150 } }
+                                Behavior on border.color { ColorAnimation { duration: 150 } }
+                                Text { anchors.left: parent.left; anchors.leftMargin: 6; anchors.verticalCenter: parent.verticalCenter; text: modelData; color: isSelected ? "#ffffff" : cText; font.pixelSize: 11 }
+                                // 点击切换选中（z:0 底层）
+                                MouseArea {
+                                    id: cusTagMA
+                                    anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; z: 0
+                                    onClicked: tagDialog.toggleTag(modelData)
+                                }
+                                // 删除按钮（右上角 ✕，z:1 高层优先接收点击）
+                                Rectangle {
+                                    anchors.right: parent.right; anchors.rightMargin: 3; anchors.top: parent.top; anchors.topMargin: 3
+                                    width: 14; height: 14; radius: 7; z: 1
+                                    color: cusDelMA.containsMouse ? "#ff4444" : "transparent"
+                                    border.color: cusDelMA.containsMouse ? "#ff4444" : (isSelected ? "#ffffff" : cSub); border.width: 1
+                                    Text { anchors.centerIn: parent; text: "✕"; color: cusDelMA.containsMouse ? "#ffffff" : (isSelected ? "#ffffff" : cSub); font.pixelSize: 8 }
+                                    MouseArea {
+                                        id: cusDelMA
+                                        anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; z: 1
+                                        onClicked: tagDialog.removeCustomTag(modelData)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                // 占位提示（无自定义 tag 时）
+                Text { visible: root.customTags.length === 0; text: "—"; color: cSub; font.pixelSize: 12; anchors.horizontalCenter: parent.horizontalCenter }
+            }
+        }
+        // ===== 底部固定按钮栏（anchors 固定在窗口底部，始终可见不被内容遮挡）=====
+        Rectangle {
+            anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
+            height: 44; color: "transparent"
+            Rectangle { anchors.top: parent.top; anchors.left: parent.left; anchors.right: parent.right; height: 1; color: Qt.rgba(cBorder.r, cBorder.g, cBorder.b, 0.5) }
+            Row {
+                anchors.fill: parent; anchors.margins: 8; spacing: 8
+                Text {
+                    text: tt("tagSelected") + "：" + tagDialog.selectedTags.length
+                    color: cSub; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter
+                    Layout.fillWidth: true
+                }
+                Row {
+                    spacing: 8; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
+                    Button {
+                        text: tt("save"); flat: true; implicitHeight: 30; implicitWidth: 80
+                        background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.2); radius: 4; border.color: cAccent; border.width: 1 }
+                        palette.buttonText: cAccent; font.pixelSize: 12
+                        onClicked: tagDialog.saveTags()
+                    }
+                    Button {
+                        id: tagCancelBtn
+                        text: tt("cancelEdit"); flat: true; implicitHeight: 30; implicitWidth: 80
+                        background: Rectangle {
+                            color: tagCancelBtn.hovered ? "#ff4444" : Qt.rgba(cText.r, cText.g, cText.b, 0.1)
+                            radius: 4; border.color: tagCancelBtn.hovered ? "#ff4444" : cBorder; border.width: 1
+                            Behavior on color { ColorAnimation { duration: 150 } }
+                            Behavior on border.color { ColorAnimation { duration: 150 } }
+                        }
+                        palette.buttonText: tagCancelBtn.hovered ? "#ffffff" : cSub; font.pixelSize: 12
+                        onClicked: tagDialog.hide()
+                    }
+                }
+            }
+        }
+    }
+
+    // ===== 日期选择器 Popup（轻量日历，供 addDialog/editDialog 选择游玩日期）=====
+    Popup {
+        id: dateSelector
+        property string targetField: ""   // "addStart"/"addFinish"/"editStart"/"editFinish"
+        property var selectedDate: new Date()
+        property int viewYear: new Date().getFullYear()
+        property int viewMonth: new Date().getMonth()
+        width: 280; height: 380
+        modal: true
+        background: Rectangle { color: root.cCard; radius: 8; border.color: root.cBorder; border.width: 1 }
+
+        function openWith(field, dateStr) {
+            targetField = field
+            if (dateStr && dateStr.length > 0) {
+                var d = root.ymdToDate(dateStr)
+                selectedDate = d
+                viewYear = d.getFullYear()
+                viewMonth = d.getMonth()
+            } else {
+                selectedDate = new Date()
+                viewYear = new Date().getFullYear()
+                viewMonth = new Date().getMonth()
+            }
+            // 根据目标字段设置父窗口，确保 Popup 显示在对应对话框之上，并计算居中坐标
+            var pw = 0, ph = 0
+            if (field === "addStart" || field === "addFinish") {
+                parent = addDialog.contentItem
+                pw = addDialog.width; ph = addDialog.height
+            } else if (field === "editStart" || field === "editFinish") {
+                parent = editDialog.contentItem
+                pw = editDialog.width; ph = editDialog.height
+            } else if (field === "detailStart" || field === "detailFinish") {
+                parent = gameDetailDialog.contentItem
+                pw = gameDetailDialog.width; ph = gameDetailDialog.height
+            }
+            // 居中于父对话框（width/height 为 Popup 自身尺寸 280×380）
+            x = Math.max(0, (pw - width) / 2)
+            y = Math.max(0, (ph - height) / 2)
+            open()
+        }
+
+        function writeBack(ymd) {
+            var displayText = ymd.length > 0 ? root.formatDate(ymd) : root.tt("selectDate")
+            if (targetField === "addStart") { addDialog.startDateValue = ymd; addStartDateBtn.text = displayText }
+            else if (targetField === "addFinish") { addDialog.finishDateValue = ymd; addFinishDateBtn.text = displayText }
+            else if (targetField === "editStart") { editDialog.startDateValue = ymd; editStartDateBtn.text = displayText }
+            else if (targetField === "editFinish") { editDialog.finishDateValue = ymd; editFinishDateBtn.text = displayText }
+            else if (targetField === "detailStart") {
+                // 详情页日期修改：同步属性 + 持久化数据库 + 刷新列表
+                gameDetailDialog.detailGameStartDate = ymd
+                dbManager.updateGame(gameDetailDialog.detailGameId, gameDetailDialog.detailGameName, gameDetailDialog.detailGameTypes,
+                    gameDetailDialog.detailGameRating, gameDetailDialog.detailGameStatus, 0,
+                    gameDetailDialog.detailGameStartDate, gameDetailDialog.detailGameFinishDate,
+                    gameDetailDialog.detailGameNotes, gameDetailDialog.detailGameCover)
+                gameListModel.refresh(searchField.text)
+            } else if (targetField === "detailFinish") {
+                gameDetailDialog.detailGameFinishDate = ymd
+                dbManager.updateGame(gameDetailDialog.detailGameId, gameDetailDialog.detailGameName, gameDetailDialog.detailGameTypes,
+                    gameDetailDialog.detailGameRating, gameDetailDialog.detailGameStatus, 0,
+                    gameDetailDialog.detailGameStartDate, gameDetailDialog.detailGameFinishDate,
+                    gameDetailDialog.detailGameNotes, gameDetailDialog.detailGameCover)
+                gameListModel.refresh(searchField.text)
+            }
+        }
+
+        Column {
+            anchors.fill: parent; spacing: 8; clip: true
+
+            // 月份导航（‹ 年月 › ✕ 关闭）
+            Row {
+                width: parent.width; height: 32
+                Button {
+                    text: "<"; flat: true; width: 32; height: 32
+                    background: Rectangle { color: "transparent" }
+                    palette.buttonText: root.cText; font.pixelSize: 14
+                    onClicked: { if (dateSelector.viewMonth === 0) { dateSelector.viewMonth = 11; dateSelector.viewYear-- } else { dateSelector.viewMonth-- } }
+                }
+                Text {
+                    text: dateSelector.viewYear + root.tt("yearStr") + (dateSelector.viewMonth + 1) + root.tt("monthStr")
+                    color: root.cText; font.pixelSize: 14
+                    horizontalAlignment: Text.AlignHCenter; width: parent.width - 96; height: 32
+                    verticalAlignment: Text.AlignVCenter
+                }
+                Button {
+                    text: ">"; flat: true; width: 32; height: 32
+                    background: Rectangle { color: "transparent" }
+                    palette.buttonText: root.cText; font.pixelSize: 14
+                    onClicked: { if (dateSelector.viewMonth === 11) { dateSelector.viewMonth = 0; dateSelector.viewYear++ } else { dateSelector.viewMonth++ } }
+                }
+                // ✕ 关闭按钮（hover 红底白字，与 FramelessDragBar 关闭按钮样式一致）
+                Button {
+                    id: dateSelectorClose
+                    text: "✕"; flat: true; width: 32; height: 32
+                    background: Rectangle {
+                        color: dateSelectorClose.hovered ? "#ff4444" : "transparent"
+                        radius: 6
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                    }
+                    palette.buttonText: dateSelectorClose.hovered ? "#ffffff" : root.cSub
+                    onClicked: dateSelector.close()
+                }
+            }
+
+            // 星期标题行
+            Row {
+                width: parent.width; height: 20
+                Repeater {
+                    model: [root.tt("sun"), root.tt("mon"), root.tt("tue"), root.tt("wed"), root.tt("thu"), root.tt("fri"), root.tt("sat")]
+                    Text { text: modelData; width: parent.width / 7; horizontalAlignment: Text.AlignHCenter; color: root.cSub; font.pixelSize: 11 }
+                }
+            }
+
+            // 日期网格
+            GridView {
+                id: dateGrid
+                width: parent.width; height: parent.height - 108
+                cellWidth: parent.width / 7; cellHeight: 32
+                interactive: false
+                clip: true
+                model: {
+                    var firstDay = new Date(dateSelector.viewYear, dateSelector.viewMonth, 1)
+                    var startOffset = firstDay.getDay()
+                    var daysInMonth = new Date(dateSelector.viewYear, dateSelector.viewMonth + 1, 0).getDate()
+                    var cells = []
+                    for (var i = 0; i < startOffset; i++) cells.push(0)
+                    for (var d = 1; d <= daysInMonth; d++) cells.push(d)
+                    while (cells.length % 7 !== 0) cells.push(0)
+                    return cells
+                }
+                delegate: Rectangle {
+                    width: dateGrid.cellWidth; height: dateGrid.cellHeight
+                    color: {
+                        if (modelData === 0) return "transparent"
+                        var cellDate = new Date(dateSelector.viewYear, dateSelector.viewMonth, modelData)
+                        var selYMD = root.dateToYMD(dateSelector.selectedDate)
+                        var cellYMD = root.dateToYMD(cellDate)
+                        return selYMD === cellYMD ? root.cAccent : (dateCellMA.containsMouse ? Qt.rgba(root.cAccent.r, root.cAccent.g, root.cAccent.b, 0.2) : "transparent")
+                    }
+                    radius: 4
+                    visible: modelData !== 0
+                    Text {
+                        anchors.centerIn: parent
+                        text: modelData === 0 ? "" : modelData
+                        color: {
+                            if (modelData === 0) return "transparent"
+                            var cellDate = new Date(dateSelector.viewYear, dateSelector.viewMonth, modelData)
+                            var selYMD = root.dateToYMD(dateSelector.selectedDate)
+                            var cellYMD = root.dateToYMD(cellDate)
+                            return selYMD === cellYMD ? "#ffffff" : root.cText
+                        }
+                        font.pixelSize: 12
+                    }
+                    MouseArea {
+                        id: dateCellMA
+                        anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: { if (modelData !== 0) dateSelector.selectedDate = new Date(dateSelector.viewYear, dateSelector.viewMonth, modelData) }
                     }
                 }
             }
 
-            // 保存/取消
-            Row { spacing: 8; anchors.horizontalCenter: parent.horizontalCenter
+            // 底部按钮
+            Row {
+                width: parent.width; spacing: 8
                 Button {
-                    text: tt("saveNotes"); flat: true; implicitHeight: 30; implicitWidth: 80
-                    background: Rectangle { color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.2); radius: 4; border.color: cAccent; border.width: 1 }
-                    palette.buttonText: cAccent; font.pixelSize: 11
-                    onClicked: { gameDetailDialog.saveInlineTypes(typeEditDialog.typeList); typeEditDialog.hide() }
+                    id: dateClearBtn
+                    text: root.tt("clearDate"); flat: true; width: (parent.width - 8) / 2; height: 32
+                    background: Rectangle {
+                        color: dateClearBtn.hovered ? "#ff4444" : Qt.rgba(root.cText.r, root.cText.g, root.cText.b, 0.1)
+                        radius: 4; border.color: dateClearBtn.hovered ? "#ff4444" : root.cBorder; border.width: 1
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
+                    }
+                    palette.buttonText: dateClearBtn.hovered ? "#ffffff" : root.cSub; font.pixelSize: 12
+                    onClicked: { dateSelector.writeBack(""); dateSelector.close() }
                 }
                 Button {
-                    text: tt("cancelEdit"); flat: true; implicitHeight: 30; implicitWidth: 80
-                    background: Rectangle { color: Qt.rgba(cText.r, cText.g, cText.b, 0.1); radius: 4; border.color: cBorder; border.width: 1 }
-                    palette.buttonText: cSub; font.pixelSize: 11
-                    onClicked: typeEditDialog.hide()
+                    text: root.tt("confirm"); flat: true; width: (parent.width - 8) / 2; height: 32
+                    background: Rectangle { color: root.cAccent; radius: 4 }
+                    palette.buttonText: "#ffffff"; font.pixelSize: 12
+                    onClicked: {
+                        var ymd = root.dateToYMD(dateSelector.selectedDate)
+                        dateSelector.writeBack(ymd)
+                        dateSelector.close()
+                    }
                 }
             }
         }
@@ -2637,7 +3337,7 @@ Window {
         id: exportFormatDialog
         title: tt("exportTitle")
         modality: Qt.WindowModal
-        transientParent: settingsDialog
+        transientParent: fileDialog
         flags: Qt.FramelessWindowHint | Qt.Window
         width: 440; height: 320
         minimumWidth: 400; minimumHeight: 280
@@ -2689,7 +3389,7 @@ Window {
         id: importTipDialog
         title: tt("importTitle")
         modality: Qt.WindowModal
-        transientParent: settingsDialog
+        transientParent: fileDialog
         flags: Qt.FramelessWindowHint | Qt.Window
         width: 480; height: 460
         minimumWidth: 440; minimumHeight: 400
@@ -2722,8 +3422,8 @@ Window {
 
     // ===== 设置窗口（Window 形式）=====
     Window {
-        id: settingsDialog
-        title: tt("settings")
+        id: fileDialog
+        title: tt("fileBtn")
         modality: Qt.WindowModal
         flags: Qt.FramelessWindowHint | Qt.Window
         width: 400; height: 400
@@ -2733,7 +3433,7 @@ Window {
         y: root.y + (root.height - height) / 2
         palette.window: cCard; palette.windowText: cText; palette.text: cText; palette.button: cCard; palette.buttonText: cText; palette.base: cInput; palette.placeholderText: cSub; palette.highlight: cAccent; palette.highlightedText: "#ffffff"
         Rectangle { anchors.fill: parent; radius: 8; color: root.cBg }
-        FramelessDragBar { dialogWindow: settingsDialog }
+        FramelessDragBar { dialogWindow: fileDialog }
         Column {
             anchors.fill: parent; anchors.margins: 16; anchors.topMargin: 38; spacing: 12
             Flickable {
@@ -2741,14 +3441,13 @@ Window {
                 contentWidth: width; contentHeight: settingsCol.height
                 ScrollBar.vertical: MainSB {}
                 Column { id: settingsCol; width: parent.width; spacing: 14
-                    BtnGhost { text: "👕 " + tt("appearance"); width: parent.width; onClicked: { appearanceDialog.show(); } }
-                    // 文档功能（原工具栏文件按钮移入此处）
+                    // 文档功能（导出/导入）
                     Label { text: tt("fileBtn"); color: cText; font.pixelSize: 14; width: parent.width }
                     Column { width: parent.width; spacing: 6; leftPadding: 12
-                        BtnGhost { text: tt("jsonFormat"); width: parent.width - 12; onClicked: { settingsDialog.close(); exportDialog.openWith("json"); } }
-                        BtnGhost { text: tt("txtFormat"); width: parent.width - 12; onClicked: { settingsDialog.close(); exportDialog.openWith("txt"); } }
-                        BtnGhost { text: tt("csvFormat"); width: parent.width - 12; onClicked: { settingsDialog.close(); exportDialog.openWith("csv"); } }
-                        BtnGhost { text: tt("selectFileToImport"); width: parent.width - 12; onClicked: { settingsDialog.close(); importTipDialog.show(); } }
+                        BtnGhost { text: tt("jsonFormat"); width: parent.width - 12; onClicked: { fileDialog.close(); exportDialog.openWith("json"); } }
+                        BtnGhost { text: tt("txtFormat"); width: parent.width - 12; onClicked: { fileDialog.close(); exportDialog.openWith("txt"); } }
+                        BtnGhost { text: tt("csvFormat"); width: parent.width - 12; onClicked: { fileDialog.close(); exportDialog.openWith("csv"); } }
+                        BtnGhost { text: tt("selectFileToImport"); width: parent.width - 12; onClicked: { fileDialog.close(); importTipDialog.show(); } }
                     }
                     // 回忆根目录设置
                     Column { width: parent.width; spacing: 6
@@ -2766,7 +3465,7 @@ Window {
             }
             Row { width: parent.width; spacing: 8
                 Item { width: parent.width - 100; height: 1 }
-                BtnClose { text: tt("close"); onClicked: settingsDialog.close() }
+                BtnClose { text: tt("close"); onClicked: fileDialog.close() }
             }
         }
         onVisibleChanged: if (visible) memoryRootField.text = dbManager.getMemoryRoot()
@@ -2780,7 +3479,7 @@ Window {
         id: appearanceDialog
         title: tt("appearance")
         modality: Qt.WindowModal
-        transientParent: settingsDialog
+        transientParent: root
         flags: Qt.FramelessWindowHint | Qt.Window
         width: 620; height: 540
         minimumWidth: 560; minimumHeight: 480
@@ -3173,8 +3872,8 @@ Window {
                     // 详情页封面裁剪：导入裁剪结果到封面目录，更新详情页封面
                     var coverPath2 = dbManager.importCover(result);
                     dbManager.updateGame(gameDetailDialog.detailGameId, gameDetailDialog.detailGameName, gameDetailDialog.detailGameTypes,
-                        gameDetailDialog.detailGameRating, gameDetailDialog.detailGameStatus, gameDetailDialog.detailGamePlayTime,
-                        "", "", gameDetailDialog.detailGameNotes, coverPath2);
+                        gameDetailDialog.detailGameRating, gameDetailDialog.detailGameStatus, 0,
+                        gameDetailDialog.detailGameStartDate, gameDetailDialog.detailGameFinishDate, gameDetailDialog.detailGameNotes, coverPath2);
                     gameDetailDialog.detailGameCover = coverPath2;
                     gameListModel.refresh(searchField.text);
                 } else {
@@ -3298,8 +3997,8 @@ Window {
                             if (cropDialog.mode === "cover") { editCoverPath.text = cp; }
                             else {
                                 dbManager.updateGame(gameDetailDialog.detailGameId, gameDetailDialog.detailGameName, gameDetailDialog.detailGameTypes,
-                                    gameDetailDialog.detailGameRating, gameDetailDialog.detailGameStatus, gameDetailDialog.detailGamePlayTime,
-                                    "", "", gameDetailDialog.detailGameNotes, cp);
+                                    gameDetailDialog.detailGameRating, gameDetailDialog.detailGameStatus, 0,
+                                    gameDetailDialog.detailGameStartDate, gameDetailDialog.detailGameFinishDate, gameDetailDialog.detailGameNotes, cp);
                                 gameDetailDialog.detailGameCover = cp;
                                 gameListModel.refresh(searchField.text);
                             }
